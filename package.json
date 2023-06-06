@@ -1,0 +1,17 @@
+{
+  "name": "@noble/docs",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "next": "^13.4.4",
+    "nextra": "^2.7.0",
+    "nextra-theme-docs": "^2.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.8"
+  }
+}

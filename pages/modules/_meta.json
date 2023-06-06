@@ -1,0 +1,7 @@
+{
+  "blockibc": "BlockIBC",
+  "fiattokenfactory": "FiatTokenFactory",
+  "globalfee": "GlobalFee",
+  "tariff": "Tariff",
+  "tokenfactory": "TokenFactory"
+}
