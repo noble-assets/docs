@@ -5,8 +5,6 @@ const withNextra = require("nextra")({
 
 /** @type {import("next").NextConfig} */
 const config = {
-  output: "export",
-  basePath: "/docs",
   images: {
     unoptimized: true,
   },
