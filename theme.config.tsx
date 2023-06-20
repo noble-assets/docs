@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import type { DocsThemeConfig } from "nextra-theme-docs";
-import { NextSeoProps } from "next-seo";
+import type { NextSeoProps } from "next-seo";
 
 const config: DocsThemeConfig = {
   chat: {
