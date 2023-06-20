@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
+import type { DocsThemeConfig } from "nextra-theme-docs";
+import { NextSeoProps } from "next-seo";
 
-export default {
+const config: DocsThemeConfig = {
   chat: {
     link: "https://twitter.com/noble_xyz",
     icon: (
@@ -12,8 +14,9 @@ export default {
       </svg>
     ),
   },
-  docsRepositoryBase: "https://github.com/noble-assets/docs",
+  docsRepositoryBase: "https://github.com/noble-assets/docs/tree/main",
   faviconGlyph: "✨",
+  // @ts-ignore
   feedback: false,
   footer: {
     text: (
@@ -44,7 +47,7 @@ export default {
             y2="-6.32322"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0.05" stopColor="white" />
+            <stop offset="0.05" stopColor="currentColor" />
             <stop offset="0.38" stopColor="#A7B3FF" />
             <stop offset="1" stopColor="#74A4FF" />
           </linearGradient>
@@ -61,7 +64,7 @@ export default {
   sidebar: {
     defaultMenuCollapseLevel: 1,
   },
-  useNextSeoProps() {
+  useNextSeoProps(): NextSeoProps {
     const { route } = useRouter();
 
     if (route !== "/") {
@@ -71,3 +74,5 @@ export default {
     }
   },
 };
+
+export default config;
