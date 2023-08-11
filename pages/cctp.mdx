@@ -1,0 +1,53 @@
+---
+title: CCTP
+---
+
+import { Callout, Steps, Tabs, Tab } from "nextra/components";
+
+# Cross-Chain Transfer Protocol
+
+[CCTP], developed by [Circle], enables canonical USDC to natively flow between supported chains.
+
+As Noble helps Circle issue canonical USDC inside the Cosmos ecosystem, we also support this standard. This allows USDC to flow from Ethereum (and many other networks) directly to Noble (and the rest of the interchain).
+
+## Transferring USDC _to_ Noble
+
+<Callout emoji={"⚡️"}>
+  Go [here](/cctp/router) if you're interested in learning how to automatically
+  route your USDC through the interchain post transfer.
+</Callout>
+
+CCTP assigns a unique number to each supported chain (also known as a **domain**), to then easily distinguish between networks. Noble, for both mainnet and testnet, is Domain 4.
+
+<Steps>
+### Deposit For Burn
+
+In order to initiate a transfer of USDC, you must first burn the USDC on the source chain.
+
+When burning, you specify where you want to transfer your USDC. In this case, you will want to use Noble's unique identifier, 4.
+
+|  Contract Name   |                                        Mainnet Address                                         |                                            Testnet Address                                            |
+| :--------------: | :--------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: |
+| `TokenMessenger` | [0xBd3fa8...66af3155](https://etherscan.io/address/0xBd3fa81B58Ba92a82136038B25aDec7066af3155) | [0xD0C3da...6114EFE8](https://goerli.etherscan.io/address/0xD0C3da58f55358142b8d3e06C1C30c5C6114EFE8) |
+
+### Attesting & Relaying
+
+Once your USDC has been burnt, Circle runs a service that watches for transfers and verifies them. If it is a valid transfer, Circle will emit an attestation for your transfer that can then be relayed to Noble.
+
+For more information on attestations, please refer to Circle's docs [here][Attestation].
+
+There are relayers running between Noble and other CCTP supported networks, that once emitted, will directly submit Circle's attestation to Noble.
+
+### Enjoy!
+
+That's it! Now that Circle's attestation of your transfer has been relayed to Noble, your USDC is immediately minted directly into your wallet. You can now use your USDC inside the Cosmos ecosystem like any other token.
+
+</Steps>
+
+## Transferring USDC _from_ Noble
+
+<Callout emoji={"🚧"}>Coming Soon!</Callout>
+
+[Attestation]: https://developers.circle.com/stablecoin/docs/cctp-getting-started#attestation-service-api
+[CCTP]: https://www.circle.com/en/cross-chain-transfer-protocol
+[Circle]: https://www.circle.com/en
