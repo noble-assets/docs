@@ -1,1 +1,7 @@
-# `x/blockibc` Module
+# `x/blockibc` IBC Transfer Middleware
+
+Block IBC is [ICS-20](https://github.com/cosmos/ibc/blob/main/spec/app/ics-020-fungible-token-transfer/README.md) middleware to prevent IBC forwarding when the asset is the issuance asset of a tokenfactory for the following cases:
+- The tokenfactory has paused the movement of funds for the asset
+- The tokenfactory has blacklisted the sender or the receiver of the IBC transfer
+
+This currently applies to the `tokenfactory` and `fiattokenfactory` modules.
