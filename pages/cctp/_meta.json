@@ -1,6 +1,7 @@
 {
-  "What is CCTP?": "cctp",
-  "CCTP Transfer to Noble": "mint",
-  "CCTP Transfer to IBC": "mint_forward",
-  "Contract Addresses": "contract_addresses"
+  "index":"What is CCTP?",
+  "mint": "Transfer to Noble",
+  "mint_forward": "Transfer to IBC Chain",
+  "burn": "Transfer from Noble",
+  "contract_addresses": "Contract Addresses"
 }

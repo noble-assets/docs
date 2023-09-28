@@ -1,0 +1,24 @@
+# Noble CCTP Send
+
+To send USDC from Noble to another chain via CCTP, use the `deposit-for-burn` or `deposit-for-burn-with-caller` command.
+
+```bash
+nobled tx cctp deposit-for-burn \
+    10000000 # 10000000uusdc = 10 USDC \
+    0 # Ethereum \
+    0x0123CA15daDb45E47B270fe025aa5B3BcbF4E5ab # address on Ethereum to receive the USDC \
+    uusdc # token to burn \
+    --from noble1tq944l2tgxugwvu74yke37yt7pa27p8467rxg5 # Transaction signer
+```
+
+The `deposit-for-burn-with-caller` command is the same as `deposit-for-burn` except that it allows you to restrict the address of the user/relayer that will execute the receive message on the destination chain. This is useful if you want to self relay the message.
+
+```bash
+nobled tx cctp deposit-for-burn-with-caller \
+    10000000 # 10000000uusdc = 10 USDC \
+    0 # Ethereum \
+    0x0123CA15daDb45E47B270fe025aa5B3BcbF4E5ab # address on Ethereum to receive the USDC \
+    uusdc # token to burn \
+    0x0123CA15daDb45E47B270fe025aa5B3BcbF4E5ab # address of the user/relayer that will execute the receive message on the destination chain \
+    --from noble1tq944l2tgxugwvu74yke37yt7pa27p8467rxg5 # Transaction signer
+```
