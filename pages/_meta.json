@@ -1,8 +1,6 @@
 {
   "index": "Home",
-  "cctp": {
-    "display": "hidden"
-  },
+  "cctp": "CCTP",
   "network": "Network",
   "modules": "Modules"
 }
