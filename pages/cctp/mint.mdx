@@ -47,11 +47,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 )
 
-func main() {
-	// -----
-	address := "noble14lwerrcfzkzrv626w49pkzgna4dtga8c5x479h"
-	// -----
+const address = "noble14lwerrcfzkzrv626w49pkzgna4dtga8c5x479h"
 
+func main() {
 	_, rawAddress, _ := bech32.DecodeAndConvert(address)
 	encodedAddress := Encode(rawAddress)
 
