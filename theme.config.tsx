@@ -64,6 +64,11 @@ const config: DocsThemeConfig = {
   sidebar: {
     defaultMenuCollapseLevel: 1,
   },
+  head: <>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Noble App Chain" />
+    <meta name="og:title" content="Noble" />
+  </>,
   useNextSeoProps(): NextSeoProps {
     const { route } = useRouter();
 
