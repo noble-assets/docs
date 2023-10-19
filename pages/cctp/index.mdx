@@ -12,17 +12,3 @@ The simple transfer flow is the same for every source/destination chain route:
 4. User receives minted funds on destination chain
 
 ![](./cctp-high-level.png)
-
-## Noble CCTP
-
-Noble's CCTP implementation additionally includes an IBC router implementation for forwarding tokens minted via CCTP to IBC-connected chains.
-
-During the burn, users can include metadata that will trigger an IBC forward after the mint. The burn/mint and forward can be received in any order.
-
-Additionally, the relaying of the forward and burn messages is automated by an off-chain service for certain routes. These relayers view CCTP messages on source chains, look up their respective attestations, and forward these messages to Noble.
-
-The result: Users sign one transaction to receive their funds on any IBC connected chain.
-
-![](./cctp-noble.png)
-
-[Cross-Chain Transfer Protocol]: https://developers.circle.com/stablecoin/docs/cctp-getting-started
