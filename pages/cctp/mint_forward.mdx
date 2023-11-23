@@ -2,9 +2,14 @@
 
 import { Callout } from "nextra/components";
 
-Noble's router module enables funds received via CCTP to be forwarded to another chain connected to Noble via IBC.
+<Callout emoji={"🚨"}>
+    **DISCLAIMER:** In the future, Noble plans to introduce a router module that will enable funds received via CCTP to be forwarded to another chain connected to Noble via IBC.
 
-## High level flow
+    The following is a high level overview of the proposed flow and initial test cases.
+
+</Callout>
+
+## Flow
 
 - User calls smart contract to burn the tokens on the source chain (Ethereum, Avalanche, Optimism, Arbitrum, etc.), including IBC forwarding instructions.
 - CCTP relayer observes finalized burn and requests Attestation from Circle Iris API
@@ -146,6 +151,7 @@ depositForBurn(
 ```
 
 ### Sample Transactions:
+
 - [Burn on ETH](https://goerli.etherscan.io/tx/0xe4a696de959ea77f1f74163a9a3585acdb982db6bbf1de6133f213b8b5764d7b)
 - [Burn message attestation](https://iris-api-sandbox.circle.com/attestations/0x10e75e360b9b84f75bc727a587451b780022acb322eb1e0144046cb6adcbc7c9)
 - [Forward message attestation](https://iris-api-sandbox.circle.com/attestations/0xa0fc7f8d80f1af46359af34efebe10d2a4be25c27c6c717c009cee4d27adb60a)
@@ -160,7 +166,6 @@ This go test runs the CCTP relayer and sends a packet:
 https://github.com/strangelove-ventures/noble-cctp-relayer/blob/main/integration/generate_eth_goerli_deposit_for_burn_with_forward_test.go
 
 ![](./cctp-e2e.png)
-
 
 [Bech32 Prefix]: https://docs.cosmos.network/v0.50/spec/addresses/bech32
 [IBC Channel]: https://ibc.cosmos.network/main/ibc/overview.html#channels

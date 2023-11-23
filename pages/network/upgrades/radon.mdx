@@ -3,8 +3,10 @@
 This upgrade introduces additional noble fee mechanics
 
 ## Global min-fee module
+
 A minimum fee is now held in the chain state. If a validator or full-node configures a `minimum-gas-prices` in ` app.toml` below the minimum-fee in the chain state, the minimum fee from state will be used instead.
 
 ## Tariff module
+
 An additional fee can be collected for outgoing IBC transfers of a specific denom. This is a basis points (BPS) fee taken proportionally to the transfer amount, up to a maximum amount.
 Fee distribution is also modified to distribute a share of fees to a configurable list of entities before the distribution-module validator distribution.
