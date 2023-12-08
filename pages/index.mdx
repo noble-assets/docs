@@ -14,7 +14,7 @@ The Noble blockchain conforms to [industry standard]((https://github.com/centreh
 
 Currently, Noble is a Proof of Authority chain with a trusted validator set that reflects a subset of Cosmos Hub validators. The validator set is permissioned by equal shares of staking tokens placed in vesting accounts. The staking tokens have no economic value. Economic security derives from fees captured by the chain in USDC and other assets on a block-by-block basis. If a double sign is detected by the chain, the validator address will be “tombstoned,” meaning that their staking tokens and the applicable address will no longer be usable for validation and resulting in the loss of all future fee revenue. The Proof of Authority model provides real economic cost to faulty validator behavior and thus provides economic security to the network that can be computed in real time based on past and projected fees.
 
-Noble intends to integrate replicated security, the shared security model of the Cosmos Hub, [in the future](https://forum.cosmos.network/t/noble-ics-v1-update/12312). 
+Noble intends to integrate replicated security, the shared security model of the Cosmos Hub, [in the future](https://forum.cosmos.network/t/noble-ics-v1-update/12312).
 
 ## Connecting to Noble
 
@@ -42,7 +42,7 @@ The NMM has the ability to initiate parameter changes. This authority is distinc
 
 **IBC Connection Maintenance:**
 
-The NMM has the ability to re-establish IBC connections that have expired. Any such action related to an IBC connection is achieved automatically upon execution by the NMM. 
+The NMM has the ability to re-establish IBC connections that have expired. Any such action related to an IBC connection is achieved automatically upon execution by the NMM.
 
 **Configuration of the NMM**
 
@@ -58,15 +58,15 @@ The NMM is a 5/7 multisignature wallet for passing a proposal to fulfill the thr
 
 NMM constituents will be rotated in and out of the multisignature wallet over time.
 
-## Noble's Economic Model 
+## Noble's Economic Model
 
-Noble does not have a native and inflationary gas token which would otherwise accrue value as a function of chain usage and utility. Thus, to incentivize Noble’s [validator set](https://docs.nobleassets.xyz/#security-guarantees-in-a-permissioned-validator-set-proof-of-authority), a transaction fee model has been established which denominates fees in USDC or ATOM (as well as other assets in the future), a share of which is distributed evenly among Noble validators. Noble’s current fee model relies primarily on fees taken on outgoing IBC transactions. 
+Noble does not have a native and inflationary gas token which would otherwise accrue value as a function of chain usage and utility. Thus, to incentivize Noble’s [validator set](https://docs.nobleassets.xyz/#security-guarantees-in-a-permissioned-validator-set-proof-of-authority), a transaction fee model has been established which denominates fees in USDC or ATOM (as well as other assets in the future), a share of which is distributed evenly among Noble validators. Noble’s current fee model relies primarily on fees taken on outgoing IBC transactions.
 
-Transaction fees on Noble are determined by two variables: a minimum gas fee and a supplemental fee. 
+Transaction fees on Noble are determined by two variables: a minimum gas fee and a supplemental fee.
 
-1. The minimum gas fee is currently set at 0.01 USDC per 100,000 gas units. This applies to internal Noble transactions (i.e., sending USDC between Noble accounts) and outgoing IBC transactions (e.g., sending USDC from a Noble address to an Osmosis or dYdX address). Importantly, all relaying transactions bypass fees. 
+1. The minimum gas fee is currently set at 0.01 USDC per 100,000 gas units. This applies to internal Noble transactions (i.e., sending USDC between Noble accounts) and outgoing IBC transactions (e.g., sending USDC from a Noble address to an Osmosis or dYdX address). Importantly, all relaying transactions bypass fees.
 
-2. The supplemental fee applies to outgoing IBC transactions only and is currently a 10 basis point fee on the value of the transaction up to a maximum of 5 USDC. 
+2. The supplemental fee applies to outgoing IBC transactions only and is currently a 10 basis point fee on the value of the transaction up to a maximum of 5 USDC.
 
 ## Media
 
