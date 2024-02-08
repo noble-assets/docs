@@ -4,5 +4,6 @@
   "mint_forward": "Forward to IBC Chain",
   "burn": "Burn on Noble",
   "contract_addresses": "Contract Addresses",
+  "module_interface": "Module Interface",
   "manual_relaying": "Troubleshooting Relaying"
 }
