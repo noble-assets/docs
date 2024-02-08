@@ -3,5 +3,6 @@
   "mint": "Mint on Noble",
   "mint_forward": "Forward to IBC Chain",
   "burn": "Burn on Noble",
-  "contract_addresses": "Contract Addresses"
+  "contract_addresses": "Contract Addresses",
+  "manual_relaying": "Troubleshooting Relaying"
 }
