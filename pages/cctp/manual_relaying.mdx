@@ -12,49 +12,49 @@ Using [Mintscan](https://mintscan.io/noble), you can easily find the user's acco
 
 ![](./troubleshoot1:9.png)
 
-## Inspecting the Transaction 
+## Inspecting the Transaction
 
-Once you find the transaction in question, you will want to inspect the event logs of the Deposit for Burn transaction. This is the information you will use to fetch the attestation signature when the transaction was verified by Circle. Look for [2] Circle CCTP V1 Message Sent.  
+Once you find the transaction in question, you will want to inspect the event logs of the Deposit for Burn transaction. This is the information you will use to fetch the attestation signature when the transaction was verified by Circle. Look for [2] Circle CCTP V1 Message Sent.
 
 ![](./troubleshoot2:9.png)
 
-Next, you will want to expand the event log and copy string for the sent message. This message is emitted by the CCTP module on Noble. Since Noble is a Cosmos chain, and all Cosmos chains encode messages in Base64, this string needs to be decoded to Hex to be compatible with Ethereum. Copy this message. 
+Next, you will want to expand the event log and copy string for the sent message. This message is emitted by the CCTP module on Noble. Since Noble is a Cosmos chain, and all Cosmos chains encode messages in Base64, this string needs to be decoded to Hex to be compatible with Ethereum. Copy this message.
 
 ![](./troubleshoot3:9.png)
 
-## Decoding Base64 to Hex 
+## Decoding Base64 to Hex
 
-Then, take this copied message to an online Base 64 -> Hex decoder. We suggest using: https://cryptii.com/pipes/base64-to-hex 
+Then, take this copied message to an online Base 64 -> Hex decoder. We suggest using: https://cryptii.com/pipes/base64-to-hex
 
-In the text area, decode to Base64 and paste in the Circle CCTP V1 Message sent. Make sure to remove the quotations from the pasted text. This converts the Base64 message to Hexadecimal bytes and “Group by” None: 
+In the text area, decode to Base64 and paste in the Circle CCTP V1 Message sent. Make sure to remove the quotations from the pasted text. This converts the Base64 message to Hexadecimal bytes and “Group by” None:
 
 ![](./troubleshoot4:9.png)
 
-Next step is to take this Hexadecimal bytes output and Keccak256 hash this data as Circle only stores hashes of this data, and not the full message output. You can use this link to hash this data: https://emn178.github.io/online-tools/keccak_256.html 
+Next step is to take this Hexadecimal bytes output and Keccak256 hash this data as Circle only stores hashes of this data, and not the full message output. You can use this link to hash this data: https://emn178.github.io/online-tools/keccak_256.html
 
-First, change the input type from UTF-8 to Hex and paste in the bytes. Copy this hash. 
+First, change the input type from UTF-8 to Hex and paste in the bytes. Copy this hash.
 
 ![](./troubleshoot5:9.png)
 
-## Fetching attestation from Circle  
+## Fetching attestation from Circle
 
-With this hash, you can now fetch the attestation. Go to https://iris-api.circle.com/attestations/ and at the end of this address add a 0x and copy the hash and enter this URL into your browser. 
+With this hash, you can now fetch the attestation. Go to https://iris-api.circle.com/attestations/ and at the end of this address add a 0x and copy the hash and enter this URL into your browser.
 
 ![](./troubleshoot6:9.png)
 
-This outputs the attestation which should be marked as “completed” as shown in the image. Copy the attestation. Now you are ready to relay. 
+This outputs the attestation which should be marked as “completed” as shown in the image. Copy the attestation. Now you are ready to relay.
 
 ![](./troubleshoot7:9.png)
 
-## Manually relaying on Ethereum    
+## Manually relaying on Ethereum
 
-Go to the MessageTransmitter contract on Etherscan. This smart contract is used to send and receive all CCTP transactions. You can find the specific link to the contract for your destination chain from [Circle’s documentation](https://developers.circle.com/stablecoins/docs/evm-smart-contracts#messagetransmitter-mainnet). 
+Go to the MessageTransmitter contract on Etherscan. This smart contract is used to send and receive all CCTP transactions. You can find the specific link to the contract for your destination chain from [Circle’s documentation](https://developers.circle.com/stablecoins/docs/evm-smart-contracts#messagetransmitter-mainnet).
 
-Click on contract, write contract, which will then prompt you to connect to Web3 and connect your wallet. 
+Click on contract, write contract, which will then prompt you to connect to Web3 and connect your wallet.
 
 ![](./troubleshoot8:9.png)
 
-When your wallet is connected, go to [5] Receive Message. Here, you will paste your attestation and the decoded hexadecimal bytes into the message field that were previously decoded under step “Decoding Base64 to Hex”. Make sure to add 0x in front of this message. Click “write”. 
+When your wallet is connected, go to [5] Receive Message. Here, you will paste your attestation and the decoded hexadecimal bytes into the message field that were previously decoded under step “Decoding Base64 to Hex”. Make sure to add 0x in front of this message. Click “write”.
 
 ![](./troubleshoot9:9.png)
 
