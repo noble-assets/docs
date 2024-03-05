@@ -16,25 +16,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
         with:
           static_site_generator: next
 
       - name: Install Dependencies
-        run: pnpm i
+        run: bun install
       - name: Build Site
-        run: pnpm next build
+        run: bun next build
 
       - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
@@ -47,4 +45,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
