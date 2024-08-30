@@ -8,7 +8,7 @@ However, IBC introduced an UX issue when transferring between multiple networks 
 
 ## Solution
 
-The `x/forwarding` module works by allowing the permissionless creation of a new account type using the `x/auth` module. This new account type, `ForwardingAccount`, adds two fields to the `BaseAccount`: the *channel id* of an IBC enabled chain connected to Noble, and the *recipient* address on that connected chain.
+The `x/forwarding` module works by allowing the permissionless creation of a new account type using the `x/auth` module. This new account type, `ForwardingAccount`, adds three fields to the `BaseAccount`: the *channel id* of an IBC enabled chain connected to Noble, the *recipient* address on that connected chain, and the *fallback* address that is used when clearing the account.
 
 ### Example
 
@@ -24,12 +24,13 @@ The `x/forwarding` module works by allowing the permissionless creation of a new
         },
         "channel": "channel-22",
         "recipient": "osmo1...",
+        "fallback": "noble1..."
         "created_at": "5513018"
     }
 }
 ```
 
- This account has the address [`noble1...`][account-noble], which natively receives $USDC and other tokens. However, the `channel` and `recepient` fields tell the `x/forwarding` module how to automatically forward any tokens that this account receives.
+ This account has the address [`noble1...`][account-noble], which natively receives $USDC and other tokens. However, the `channel` and `recepient` fields tell the `x/forwarding` module how to automatically forward any tokens that this account receives. The *fallback* fields tells the module where to send tokens when clearing the account.
 
 ## Usage
 
@@ -40,8 +41,14 @@ There are three ways that someone can register a forwarding account on Noble.
 You can register a forwarding account by submitting a transaction directly to Noble. This can be done via our CLI:
 
 ```shell
-nobled tx forwarding register-account [channel] [recipient]
+nobled tx forwarding register-account [channel] [recipient] [fallback]
 ```
+
+#### Fields
+
+*channel*: specifies the IBC channel through which tokens are forwarded
+*recipient*: the address that receives the forwarded tokens
+*fallback*: a Noble address used if forwarding to the primary recipient fails
 
 ### 2. Via an ICS-20 Transfer
 
@@ -51,13 +58,20 @@ You can register a forwarding account by sending an ICS-20 transfer packet to No
 {
     "noble": {
         "forwarding": {
-            "recipient": "cosmos1..."
+            "recipient": "cosmos1...",
+            "fallback": "noble1..."
         }
     }
 }
 ```
 
 By default, the *channel* of the forwarding account is set from the channel used to create the account; however, you can manually override this by additionally specifying in the `channel` field.
+
+#### Fields
+
+*channel*: specifies the IBC channel through which tokens are forwarded
+*recipient*: the address that receives the forwarded tokens
+*fallback*: a Noble address used if forwarding to the primary recipient fails
 
 ### 3. Via an IBC Packet
 
@@ -67,13 +81,79 @@ You can register a forwarding account by including the following data in the mem
 {
   "noble": {
     "forwarding": {
-      "recipient": "cosmos1..."
+      "recipient": "cosmos1...",
+      "fallback": "noble1..."
     }
   }
 }
 ```
 
 By default, the *channel* is implied from the incoming IBC packet; however, you can manually override this by additionally specifying in the `channel` field.
+
+#### Fields
+
+*channel*: specifies the IBC channel through which tokens are forwarded
+*recipient*: the address that receives the forwarded tokens
+*fallback*: a Noble address used if forwarding to the primary recipient fails
+
+## Clearing a Forwarding Account
+
+Clearing a forwarding account should be performed when tokens are stuck in the account due to an issue with the respective channel. If you need to clear a forwarding account, this can be done using the CLI:
+
+```json
+nobled tx forwarding clear-account [address] --from [signer]
+```
+This will clear the forwarding account, sending all tokens in the account to the *fallback* address.
+
+#### Fields
+
+*address*: the address of the forwarding account
+*signer*: the address that registered the forwarding account
+
+## Querying Forwarding Information
+
+The x/forwarding module provides several queries that allow you to retrieve information about forwarding accounts, allowed denominations, and overall statistics.
+
+### Get Allowed Denominations
+
+Get the list of denominations currently allowed for forwarding:
+
+```json
+nobled query forwarding denoms
+```
+
+### Get Forwarding Account Details
+
+Get the details of a specific forwarding account. The response contains the associated channel and recipient:
+
+```json
+nobled query forwarding address [channel] [address]
+```
+
+#### Fields
+
+*channel*: specifies the IBC channel through which tokens are forwarded
+*address*: the address of the forwarding account
+
+### Querying Forwarding Statistics
+
+Get an overview of forwarding statistics. The response contains the number of accounts and the amount forwarded:
+
+```json
+nobled query forwarding stats
+```
+
+### Querying Statistics by Channel
+
+Retrieve forwarding statistics specific to a particular channel. The response contains the number of accounts and the amount forwarded, specific to that channel.
+
+```json
+nobled query forwarding stats-by-channel [channel]
+```
+
+#### Fields
+
+*channel*: specifies the IBC channel to get stats of
 
 [account]: https://rest.testcosmos.directory/nobletestnet/cosmos/auth/v1beta1/accounts/noble1ff834feyg9advguuqkqzfeh8j7rckx5rq7fwl6
 [account-noble]: https://www.mintscan.io/noble-testnet/address/noble1ff834feyg9advguuqkqzfeh8j7rckx5rq7fwl6
