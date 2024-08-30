@@ -2,36 +2,34 @@
 
 ## Background
 
-When the [Inter-Blockchain Communication][ibc] (**IBC**) protocol was introduced into the Cosmos ecosystem, it revolutionised how app-chains communicate with each other. IBC to this day is primarily used to facilitate asset transfers between app-chains via the token transfer standard, ICS-20.
+When [Inter-Blockchain Communication][ibc] (**IBC**) was introduced into Cosmos, it set the standard on how app-chains communicate with each other. IBC is primarily used to facilitate asset transfers between app-chains via ICS-20, the token transfer standard.
 
-Although revolutionary, IBC introduced an UX issue when transferring between multiple networks at once. In order to take your assets from *Chain A* (e.g. Osmosis), through *Chain B* (e.g. Noble), to *Chain C* (e.g. dYdX), this would require 2 separate transactions signed by the user (one on *Chain A* and another on *Chain B*).
-
-Spearheaded by the [Strangelove Labs][strangelove] team, [Packet Forward Middleware][pfm] (**PFM**) was born. PFM is an improvement on this issue by allowing users to utilise an "intents" like system that only requires them to sign a single transaction to transfer between chains.
-
-However, this only solves the issue when a user is directly interacting with IBC, and its various tooling. However, with Noble's introduction of native $USDC, users are now given many tools like [Circle Mint][mint] and [CCTP][cctp] to receive and transfer assets. Therefore, the Noble Core Team sought to design a forwarding-like system for all middleware and protocols integrated with Noble.
+However, IBC introduced an UX issue when transferring between multiple networks at once. In order to take your assets from *Chain A* (e.g. Osmosis), through *Chain B* (e.g. Noble), to *Chain C* (e.g. dYdX), this would require 2 separate transactions signed by the user (one on *Chain A* and another on *Chain B*). To address this issue, the Noble team designed a forwarding system for all middleware and protocols integrated with Noble using [Packet Forward Middleware (PFM)][pfm]. Now, with Noble's issuance of native $USDC, users can use tools like [Circle Mint][mint] and [CCTP][cctp] to receive and transfer assets seamlessly on multiple networks.
 
 ## Solution
 
-The `x/forwarding` module works by allowing the permissionless creation of a new account type, utilising existing functionality in the `x/auth` module. This new account type, `ForwardingAccount`, contains two additional data items: the *Channel ID* of a IBC enabled chain connected to Noble, and the *Recipient* address on that connected chain encoded via the Bech32 standard.
+The `x/forwarding` module works by allowing the permissionless creation of a new account type using the `x/auth` module. This new account type, `ForwardingAccount`, adds two fields to the `BaseAccount`: the *channel id* of an IBC enabled chain connected to Noble, and the *recipient* address on that connected chain.
 
-```json showLineNumbers {10-11}
+### Example
+
+```json
 {
     "account": {
         "@type": "/noble.forwarding.v1.ForwardingAccount",
         "base_account": {
-            "address": "noble1ff834feyg9advguuqkqzfeh8j7rckx5rq7fwl6",
+            "address": "noble1...",
             "pub_key": null,
             "account_number": "0",
             "sequence": "0"
         },
         "channel": "channel-22",
-        "recipient": "osmo1ujcqk24anr83ypmezn4t8l9u0cdjjsklnwrgr9",
+        "recipient": "osmo1...",
         "created_at": "5513018"
     }
 }
 ```
 
-Let's take the above forwarding account from [Noble's testnet][account]. This account has the address [`noble1ff834...`][account-noble], which can be used to natively receive $USDC and other tokens. However, it additionally has the highlighted fields. These tell the `x/forwarding` module to automatically forward any tokens that this account receives via [*Channel 22* (Osmosis testnet)][channel] to [`osmo1ujcqk...`][account-osmosis]
+ This account has the address [`noble1...`][account-noble], which natively receives $USDC and other tokens. However, the `channel` and `recepient` fields tell the `x/forwarding` module how to automatically forward any tokens that this account receives.
 
 ## Usage
 
@@ -53,17 +51,29 @@ You can register a forwarding account by sending an ICS-20 transfer packet to No
 {
     "noble": {
         "forwarding": {
-            "recipient": "FILL IN"
+            "recipient": "cosmos1..."
         }
     }
 }
 ```
 
-By default, the *Channel* of the forwarding account is inferred from where you sent the transfer packet, however, you can manually override this by additionally specifying the `"channel"` field.
+By default, the *channel* of the forwarding account is set from the channel used to create the account; however, you can manually override this by additionally specifying in the `channel` field.
 
 ### 3. Via an IBC Packet
 
-🚧 Documentation Coming Soon 🚧
+You can register a forwarding account by including the following data in the memo field of an IBC packet sent to Noble.
+
+```json
+{
+  "noble": {
+    "forwarding": {
+      "recipient": "cosmos1..."
+    }
+  }
+}
+```
+
+By default, the *channel* is implied from the incoming IBC packet; however, you can manually override this by additionally specifying in the `channel` field.
 
 [account]: https://rest.testcosmos.directory/nobletestnet/cosmos/auth/v1beta1/accounts/noble1ff834feyg9advguuqkqzfeh8j7rckx5rq7fwl6
 [account-noble]: https://www.mintscan.io/noble-testnet/address/noble1ff834feyg9advguuqkqzfeh8j7rckx5rq7fwl6
