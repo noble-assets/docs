@@ -31,7 +31,7 @@ The `x/forwarding` module works by allowing the permissionless creation of a new
 }
 ```
 
-This account has the address `noble1...`, which natively receives $USDC and other tokens. However, the `channel` and `recepient` fields tell the `x/forwarding` module how to automatically forward any tokens that this account receives. The *fallback* fields tells the module where to send tokens when clearing the account.
+This account has the address `noble1...`, which natively receives $USDC and other tokens. However, the `channel` and `recepient` fields tell the `x/forwarding` module how to automatically forward any tokens that this account receives.
 
 ## Usage
 
@@ -73,20 +73,6 @@ By default, the *channel* is implied from the incoming IBC packet; however, you 
 *channel*: specifies the IBC channel through which tokens are forwarded
 
 *recipient*: the address that receives the forwarded tokens
-
-## Clearing a Forwarding Account
-
-Clearing a forwarding account should be performed when tokens are stuck in the account due to an issue with the respective channel. If you need to clear a forwarding account, this can be done using the CLI:
-
-```json
-nobled tx forwarding clear-account [address] --from [signer] --fallback.
-```
-This will clear the forwarding account, sending all tokens in the account to the *fallback* address. If the `--fallback` flag is not included, it will instead attempt to forward the tokens to the destination address.
-
-#### Fields
-
-*address*: the address of the forwarding account
-*signer*: the address that registered the forwarding account
 
 ## Querying Forwarding Information
 
