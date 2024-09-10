@@ -12,9 +12,6 @@ However, this only solves the issue when a user is directly interacting with IBC
 
 The `x/forwarding` module works by allowing the permissionless creation of a new account type using the `x/auth` module. This new account type, `ForwardingAccount`, adds two fields to the `BaseAccount`: the *channel id* of an IBC enabled chain connected to Noble, and the *recipient* address on that connected chain.
 
-Below is an example of how forwarding may be used to transfer tokens from an exchange to an IBC-connected chain.
-![Forwarding From CEX to IBC](images/forwarding_swimlane_cex_to_ibc.jpg)
-
 ### Example
 
 ```json
@@ -35,6 +32,9 @@ Below is an example of how forwarding may be used to transfer tokens from an exc
 ```
 
 This account has the address `noble1...`, which natively receives $USDC and other tokens. However, the `channel` and `recipient` fields tell the `x/forwarding` module how to automatically forward any tokens that this account receives.
+
+Below is an example of how forwarding may be used to transfer tokens from an exchange to an IBC-connected chain.
+![Forwarding From CEX to IBC](images/forwarding_swimlane_cex_to_ibc.jpg)
 
 ## Usage
 
