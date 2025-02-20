@@ -1,0 +1,71 @@
+---
+slug: /
+sidebar_position: 1
+title: Welcome!
+hide_title: true
+---
+
+import React from 'react';
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import GitHubButton from '@site/src/components/GitHubButton';
+
+<div style={{ 
+  backgroundImage: `url(${useBaseUrl('/img/bg.png')})`, 
+  backgroundSize: 'cover', 
+  backgroundPosition: 'calc(50% - 70px) calc(50% + 80px)',
+  backgroundRepeat: 'no-repeat',
+  height: '30vh',
+  position: 'relative',
+  maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)',
+  WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)'
+  
+}}>
+  <h1 style={{ textAlign: 'center', paddingTop: '20px'}}>Welcome to Noble's Documentation</h1>
+</div>
+
+## Introduction
+
+Noble is an [application-specific blockchain](https://docs.cosmos.network/main/learn/intro/why-app-specific) 
+built on the Cosmos SDK, purpose-built for asset issuance with a focus on stablecoins and real-world assets (RWAs). As an 
+IBC-enabled chain, Noble ensures seamless interoperability across the Cosmos ecosystem enabling fast and secure transactions.
+Additionally, Noble has implemented Circle's [Cross-Chain Transfer Protocol (CCTP)](https://www.circle.com/cross-chain-transfer-protocol) 
+to facilitate transfers across multiple blockchain networks.
+
+You can learn more about the assets we offer [here](https://www.noble.xyz/#assets)!
+
+<div style={{ marginLeft: '20px' }}>
+  ### 📋 Specs
+  - **Consensus Mechanism:** CometBFT
+  - **Consensus Model:** [Proof of Authority (PoA)](./poa/)
+  - **Block Times:** 1 - 1.5 seconds
+
+  ### 🏦 Asset Issuance Chain
+  Noble is purpose-built to support **issuance, management, and transfer** of digital assets with a strong focus on:
+  - **Stablecoins** for global financial applications.
+  - **Real-World Assets (RWAs)**, including tokenized financial instruments.
+  - **Native RWA Offering:** **USDN**, a stable and secure digital asset issued directly on Noble.
+
+  ### 🔗 Interoperability with IBC
+  As an **IBC-enabled chain**, Noble seamlessly integrates with the **Cosmos ecosystem**, 
+  allowing assets to flow securely between different blockchains. This ensures:
+  - Cross-chain liquidity.
+  - Secure and permissionless transfers.
+</div>
+
+## Getting Started
+
+For `nobled` installation instructions, please refer to Noble's <GitHubButton repoUrl="https://github.com/noble-assets/noble"/>.
+
+You can quickly spin up a local Noble chain or replicate the mainnet or testnet state locally by following the 
+[local net quick start](https://github.com/noble-assets/noble/tree/main/local_net) guide.
+
+## Community
+
+Join our community to stay updated and get support:
+- [X](https://x.com/noble_xyz)
+- [Discord](https://discord.gg/qefFy28Z)
+
+## Feedback
+
+We value your feedback! If you have any suggestions or encounter any issues, reach out via Discord or contact us [here](https://www.noble.xyz/#contact).
