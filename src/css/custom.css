@@ -6,13 +6,13 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #bbc2ff;
-  --ifm-color-primary-dark: #8f9aff;
-  --ifm-color-primary-darker: #7987ff;
-  --ifm-color-primary-darkest: #364bff;
-  --ifm-color-primary-light: #d1d6ff;
-  --ifm-color-primary-lighter: #dadeff;
-  --ifm-color-primary-lightest: #e7eaff;
+  --ifm-color-primary: #4e5dbc;
+  --ifm-color-primary-dark: #4250ae;
+  --ifm-color-primary-darker: #3e4ca4;
+  --ifm-color-primary-darkest: #333f87;
+  --ifm-color-primary-light: #616fc3;
+  --ifm-color-primary-lighter: #6b77c7;
+  --ifm-color-primary-lightest: #8892d2;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -70,14 +70,14 @@ background-size: cover;
 }
 
 html[data-theme='dark'] .launch-express {
-  background-color: #3C4992;
+  background-color: var(--ifm-color-primary-darkest);
   border-radius: 4px;
   margin-right: 12px;
   transition-property: all;
 }
 
 .launch-express {
-  background-color: #909FFF;
+  background-color: var(--ifm-color-primary-lightest);
   border-radius: 4px;
   margin-right: 12px;
   transition-property: all;
@@ -85,6 +85,7 @@ html[data-theme='dark'] .launch-express {
 
 .launch-express:hover {
   background-color: var(--ifm-color-primary-darker);
+  -webkit-text-fill-color: white;
 }
 
 .wallets-container {
