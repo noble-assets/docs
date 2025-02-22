@@ -1,0 +1,104 @@
+---
+title: Full Archive
+description: Run a full Noble archive node.
+sidebar_position: 3
+---
+
+import PolkachuIcon from '@site/src/components/PolkachuIcon';
+
+#### You have two options when it comes to syncing or restoring a Noble full archive node.
+
+## Sync from Archival Snapshot (recommended)
+
+#### We leverage <PolkachuIcon /> Polkachu's Archival snapshot service! 
+
+You can download the latest snapshot [here](https://polkachu.com/archive_snapshots/noble). 
+
+Then follow the [snapshot instructions](https://polkachu.com/tendermint_snapshots/noble).
+
+To ensure your node retains all of its state, you will need to set `pruning` to `"nothing"` in `app.toml`:
+
+```toml title="$HOME/.noble/config/app.toml"
+pruning = "nothing"
+```
+
+Also, ensure `indexer` is set to `"kv"` in `config.toml`, which should be the default.
+
+```toml title="$HOME/.noble/config/config.toml"
+[tx_index]
+indexer = "kv"
+```
+
+---
+
+## Manually Sync from Genesis
+
+Be ready, this is a tedious and time consuming process as you are starting from block 0!
+
+Clone repo, then download `v1.0.0` of Noble:
+
+```sh
+git clone https://github.com/noble-assets/noble.git
+cd noble
+git checkout v1.0.0
+make install
+```
+
+Initialize the node:
+
+```sh
+nobled init <moniker>
+```
+
+Download the genesis file:
+
+```sh
+curl -o $HOME/.noble/config/genesis.json https://raw.githubusercontent.com/noble-assets/docs/main/genesis_files/mainnet/genesis.json
+```
+
+In your `config.toml` add a comma separated list of peers that also are archival nodes.
+
+Noble's peer: `<coming soon>`
+
+
+Also, ensure `indexer` is set to `"kv"`, which should be the default.
+
+```toml title="$HOME/.noble/config/config.toml"
+[p2p]
+
+persistent_peers = ""
+
+...
+
+[tx_index]
+
+indexer = "kv"
+```
+
+To ensure your node retains all of its state, you will need to set `pruning` to `"nothing"` in `app.toml`:
+
+```toml title="$HOME/.noble/config/app.toml"
+pruning = "nothing"
+```
+
+Start your node:
+
+```sh  
+nobled start
+```
+
+Your node will start to sync. It will halt when it hits an upgrade height.
+
+Reference this [chart](../chain-upgrades/mainnet.mdx) to see heights and versions.
+
+Once your node halts and is waiting for an upgrade, stop the node, update the binary to the next version, and start it again.
+
+Be sure to pay attention to the `--halt-height` in the chart, as you will need to occasionally set that value when upgrading.
+
+```sh
+git checkout <next-version>
+make install
+nobled start
+```
+
+*We wish you success on this journey*

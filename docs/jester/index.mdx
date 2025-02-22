@@ -1,9 +1,10 @@
 ---
-title: Jester (Side Car)
+title: Jester (Sidecar)
 hide_title: true
 ---
 
 import GitHubButton from '@site/src/components/GitHubButton';
+import DocCardList from '@theme/DocCardList';
 
 <div style={{ display: 'flex'}}>
 ```log
@@ -15,7 +16,7 @@ import GitHubButton from '@site/src/components/GitHubButton';
  ╚════╝ ╚══════╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
                              Noble's sidekick  
  ```
- </div>
+</div>
 
 Jester is a sidecar application designed to be run by the Noble validator set. It facilitates the implementation of the Noble Dollar ($USDN), powered by M0.
 
@@ -32,4 +33,10 @@ Jester acts as a relayer listening for `$USDN` transfers between Ethereum and No
 As events are observed, Jester accumulates Wormhole VAA's (Verified Action Approvals).
 These VAA's are handed off to Noble validators and submitted on-chain.
 
-For all information around Jester including installation, configuration and usage, please refer to Jesters <GitHubButton repoUrl="https://github.com/noble-assets/jester"/>.
+## Installation
+
+Visit Jester's <GitHubButton repoUrl="https://github.com/noble-assets/jester"/> for all information around installation, configuration, and usage.
+
+---
+
+<DocCardList />

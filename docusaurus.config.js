@@ -87,9 +87,14 @@ const config = {
             label: 'Explorer'
           },
           {
+            href: 'https://api.noble.xyz',
+            position: 'left',
+            label: 'API'
+          },
+          {
             href: 'https://www.noble.xyz/#assets',
             position: 'left',
-            label: 'Assets'
+            label: 'Issued Assets'
           },
           // {to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -165,8 +170,9 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} NASD`,
       },
       prism: {
-        theme: prismThemes.github,
-        darkTheme: prismThemes.dracula,
+        theme: prismThemes.vsLight,
+        darkTheme: prismThemes.oceanicNext,
+        additionalLanguages: ['toml', 'bash', 'log'],
       },
     }),
 };
