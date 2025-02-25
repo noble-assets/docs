@@ -12,6 +12,74 @@ import GitHubButton from '@site/src/components/GitHubButton';
 
 <GitHubButton repoUrl="https://github.com/noble-assets/dollar"/>
 
-## Nobles USDN
+## Noble USDN
 
 <img src="/img/usdn_banner.png" alt="USDN Banner" width="400" />
+
+The 💵 Noble Dollar (USDN) Module facilitates the issuance and management of USDN, a stablecoin backed by $M (M^0 token). This module enables secure, decentralized, and IBC-compatible transactions of USDN across the Cosmos ecosystem.
+
+The module provides mechanisms for minting, burning, transferring, querying USDN-.
+
+## Usage
+
+
+Users can transfer USDN on Noble chain between accounts. Note: IBC transfers are not supported yet
+
+```
+nobled tx bank send <to_address> <amount> --from <signer>
+```
+
+Any held USDN accrues yield for the user, who can claim their accrued yield from USDN holdings.
+
+```
+nobled tx dollar claim-yield --from <signer>
+```
+
+This message facilitates cross-chain transfers and permissionless manual relaying for USDN within the Noble Dollar Portal.
+
+```
+nobled tx dollar portal deliver <vaa_payload> --from <signer>
+```
+
+## Queries
+
+### Vault Usage
+
+Users can deposit or withdraw their USDN in a vault.
+
+The Points Program offers two specialized vaults designed to reward users for locking up USDN: the Points Vault and the Yield Vault. These vaults work together to maximize user rewards while maintaining flexibility.
+- Points Vault: When you lock USDN here, you earn points based on the amount and duration of your deposit. The longer your funds remain in the vault, the more points you accumulate. These points contribute to your overall rewards in the program.
+- Yield Vault: Instead of earning yield directly, deposits in the Points Vault redirect their yield to the Yield Vault. This concentrated yield creates boosted returns for Yield Vault participants, offering higher rewards than standard USDN yield opportunities.
+
+| Vault Name | Vault Type | Description |
+|:------------|-------------|-------------|
+| Points | `staking` | Earns Points for users |
+| Yield | `flexible` | Earns additional yield for users |
+
+```
+nobled tx dollar vaults lock <vault_type> <amount> --from <signer>
+
+nobled tx dollar vaults unlock <vault_type> <amount> --from <signer>
+```
+
+### Vault Queries
+
+Query all vault positions for a given address.
+
+```
+nobled q dollar vaults positions-by-provider <address>
+```
+
+Query if vault operations are paused.
+
+```
+nobled q dollar vaults paused
+```
+
+Query for aggregated vault statistics, including total principal locked, number of users, and distributed rewards.
+
+```
+nobled q dollar vaults stats
+```
+
+
