@@ -1,8 +1,0 @@
-{
-  "blockibc": "BlockIBC",
-  "fiattokenfactory": "FiatTokenFactory",
-  "forwarding": "Forwarding",
-  "globalfee": "GlobalFee",
-  "tariff": "Tariff",
-  "tokenfactory": "TokenFactory"
-}

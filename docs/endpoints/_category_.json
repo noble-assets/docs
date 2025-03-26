@@ -1,0 +1,7 @@
+{
+  "label": "Endpoints",
+  "link": {
+    "type": "generated-index",
+    "description": "Helpful information used to query the chain including RPC, gRPC, and API endpoints."
+  }
+}

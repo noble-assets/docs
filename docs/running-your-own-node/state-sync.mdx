@@ -1,0 +1,81 @@
+---
+title: State Sync (recommended)
+description: Restore via peers over an RPC state machine snapshot. Fastest.
+sidebar_position: 1
+---
+
+*State sync rapidly bootstraps a new node by discovering, fetching, and restoring a state machine
+snapshot from peers instead of fetching and replaying historical blocks.*
+
+## How To
+
+If you are starting from scratch, initialize your node:
+
+```sh
+# Note: if syncing testnet, change the chain-id to `grand-1`
+nobled init <moniker> --chain-id noble-1
+```
+
+Otherwise, ensure your node is stopped, then reset state:
+
+```sh
+nobled comet unsafe-reset-all --keep-addr-book
+```
+
+In your `config.toml` you will need to set four values:
+
+```toml title="$HOME/.noble/config/config.toml"
+[statesync]
+
+enable = true
+
+...
+
+rpc_servers = ""
+trust_height = 0
+trust_hash = ""
+```
+
+Here is a helpful script to fill out the above values[^1]:
+
+```bash title="state_sync.sh"
+#!/bin/bash
+
+NOBLE_RPC="https://rpc.noble.xyz:443"
+POLKA_RPC="https://noble-rpc.polkachu.com:443"
+# TESTNET
+# NOBLE_RPC="https://testnet-rpc.noble.xyz:443"
+# POLKA_RPC="https://noble-testnet-rpc.polkachu.com:443"
+
+LATEST_HEIGHT=$(curl -s $NOBLE_RPC/block | jq -r .result.block.header.height); \
+BLOCK_HEIGHT=$((LATEST_HEIGHT - 2000)); \
+TRUST_HASH=$(curl -s "$NOBLE_RPC/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
+
+sed -i.bak -E "
+s|^(enable[[:space:]]+=[[:space:]]+).*$|\1true| ; \
+s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$NOBLE_RPC,$POLKA_RPC\"| ; \
+s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$BLOCK_HEIGHT| ; \
+s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"|" $HOME/.noble/config/config.toml
+```
+
+Ensure script has privileges to execute, then run it:
+
+```sh
+chmod 700 state_sync.sh
+./state_sync.sh
+```
+
+Start your node, it should be begin syncing!
+
+```sh
+nobled start
+```
+
+⚠️ If you are having trouble, you can try adding **peers**([Mainnet](../endpoints/mainnet.mdx#peers)|[Testnet](../endpoints/testnet.mdx#peers)) to 
+`persistent_peers` of your `config.toml`.
+
+## More Info
+
+You can read more about state sync in the [Cosmos SDK core documentation](https://github.com/cosmos/cosmos-sdk/tree/v0.50.12/store/snapshots).
+
+[^1]: [Referenced from Polkachu](https://polkachu.com/state_sync/noble)

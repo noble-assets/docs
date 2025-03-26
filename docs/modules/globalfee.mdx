@@ -1,0 +1,57 @@
+---
+tags: 
+    - Module
+    - BuiltByNoble💪
+description: Fee requirements for transactions
+---
+
+import GitHubButton from '@site/src/components/GitHubButton';
+
+# x/globalfee 
+
+<GitHubButton repoUrl="https://github.com/noble-assets/globalfee"/>
+
+The **Globalfee Module** allows for flexible fee management on the Noble blockchain. 
+It provides the ability to **bypass certain message types** from paying transaction 
+fees while ensuring non-bypassed messages comply with minimum required gas prices.
+
+Because Noble does not have a Governance Module, updating parameters for this module 
+must be broadcasted by the [Authority Module](./authority.mdx) controlled by the [NMM](../governance/).
+
+## Usage
+
+### Update Bypass Messages
+Allows an authorized address to specify which messages can bypass required gas fees.
+
+For example, broadcasting the following message will allow all bank sends and IBC client update messages to be exempt from gas fees:
+
+```sh
+nobled tx globalfee update-bypass-messages /cosmos.bank.v1beta1.MsgSend /ibc.core.client.v1.MsgUpdateClient
+```
+
+### Update Minimum Gas Prices
+Allows an authorized address to update the minimum required gas prices for **non-bypassed messages**.
+
+Example:
+
+```sh
+nobled tx globalfee update-gas-prices '0.01uusdc,0.02ibc/EF48E6B1A1A19F47ECAEA62F5670C37C0580E86A9E88498B7E393EB6F49F33C0'
+```
+
+⚠️ This message will overwrite the entire list, it does not append to it.
+
+---
+
+## Queries
+
+Query for all the message types that are exempt from gas fees.
+
+```sh
+nobled q globalfee bypass-messages
+```
+
+Query for the minimum gas prices for non-bypassed messages.
+
+```sh
+nobled q globalfee gas-prices
+```
