@@ -1,10 +1,10 @@
-# Website
+<p align="center"><img src="./static/img/logo.svg" width="256" /></p>
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+<h1 align="center">Noble Chain Documentation</h1>
 
 ### Installation
 
-```
+```sh
 $ yarn
 ```
 
@@ -18,7 +18,7 @@ This command starts a local development server and opens up a browser window. Mo
 
 ### Build
 
-```
+```sh
 $ yarn build
 ```
 
