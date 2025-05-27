@@ -12,7 +12,7 @@ CCTP enables USDC to be received on Noble from a counterparty chain. At the time
 
 - User calls smart contract to burn the tokens on the source chain
 - CCTP relayer observes finalized burn and requests Attestation from Circle Iris API
-- Cirle Iris API proves burn and issues attestation
+- Circle Iris API proves burn and issues attestation
 - CCTP relayer broadcasts the message and attestation to Noble
 - Noble processes the CCTP BurnMessage and mints the token to the Noble recipient
 

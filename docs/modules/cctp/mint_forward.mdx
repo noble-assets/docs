@@ -10,7 +10,7 @@ description: Forwarding CCTP transactions through Noble to another IBC chain
 
 - User calls smart contract to burn the tokens on the source chain (Ethereum, Avalanche, Optimism, Arbitrum, etc.), including IBC forwarding instructions.
 - CCTP relayer observes finalized burn and requests Attestation from Circle Iris API
-- Cirle Iris API proves burn with metadata and issues attestations
+- Circle Iris API proves burn with metadata and issues attestations
 - CCTP relayer broadcasts the messages and attestations to Noble
 - Noble processes the CCTP BurnMessage and mints the token
 - Noble processes the CCPT IBC forward metadata message and forwards the token to the destination chain
