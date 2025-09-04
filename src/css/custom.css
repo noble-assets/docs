@@ -4,12 +4,12 @@
  * work well for content-centric websites.
  */
 
- @import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap');
+ @import url("https://fonts.googleapis.com/css2?family=Inter:opsz@400;700&display=swap");
 
   /* You can override the default Infima variables here. */
 :root {
-  --ifm-font-family-base: 'Play', sans-serif;
-  --ifm-font-family-heading: 'Play', sans-serif;
+  --ifm-font-family-base: 'Inter', sans-serif;
+  --ifm-font-family-heading: 'Inter', sans-serif;
 
   --ifm-color-primary: #4e5dbc;
   --ifm-color-primary-dark: #4250ae;
