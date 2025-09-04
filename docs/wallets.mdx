@@ -1,0 +1,39 @@
+---
+title: Wallets
+---
+
+import ThemedImage from '@theme/ThemedImage';
+
+## Non-custodial:
+
+<div className="wallets-container">
+  <div className="wallet-container">
+    <a href="https://www.keplr.app/" target="_blank" rel="noopener noreferrer">
+        <ThemedImage
+        sources={{
+            light: '/img/keplr_dark.png',
+            dark: '/img/keplr_light.png',
+        }}
+        alt="keplr wallet logo"
+        width="75px"
+        />
+    </a>
+  </div>
+
+  <div className="wallet-container">
+    <a href="https://leapwallet.io/" target="_blank" rel="noopener noreferrer">
+      <img src="/img/leap_wallet.png" alt="leap wallet logo" width="65" />
+    </a>
+  </div>
+</div>
+
+
+## Using the CLI:
+
+```sh
+# Create new wallet
+nobled keys add <KEY-NAME>
+
+# Recover wallet
+nobled keys add <KEY-NAME> --recover
+```

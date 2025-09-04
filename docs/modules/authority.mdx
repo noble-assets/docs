@@ -1,0 +1,73 @@
+---
+tags: 
+    - Module
+    - BuiltByNoble💪
+description: Authority module to assist with governance
+---
+
+import GitHubButton from '@site/src/components/GitHubButton';
+
+# x/authority
+
+<GitHubButton repoUrl="https://github.com/noble-assets/authority"/>
+
+The 🔒**Authority Module** allows a designated multi-signature address, in this case the 
+***Noble Maintenance Multisig (NMM)***, to execute 
+privileged operations on the chain.
+
+Each module has the ability to assign the `Authority` module as its authority.
+In Noble's case, this happens in the [app.yaml](https://github.com/noble-assets/noble/blob/main/app.yaml).
+
+Because Noble does not have a Governance Module, the Authority module is used to
+facilitate governance actions. To learn more about the NMM and Noble governance, 
+check out the [Governance](../governance/index.mdx) section.
+
+## Usage
+
+The module allows for arbitrary execution of messages.
+
+```sh
+nobled tx authority execute <FILE.json> --from nmm
+```
+
+However the modules primary use case will likely be used for `software upgrades`, `ibc client recovery`, and `parameter changes`.
+
+Helper commands are included for some of these scenarios.
+
+```sh
+# software upgrade
+nobled tx authority software-upgrade <name> [--upgrade-height <height>] [--upgrade-info <info>] --from nmm
+
+# recover IBC client
+nobled tx authority recover-client [subject-client-id] [substitute-client-id] --from nmm
+```
+
+### 👤 Transfer Ownership
+
+In cases where the authority address needs to be rotated, the current owner can transfer ownership to a new address.
+
+```sh
+nobled tx authority transfer-ownership <new-owner> --from <current-owner>
+```
+
+⚠️ **Important:** The new owner **must execute** `accept-ownership` to finalize the transfer.
+
+```sh
+nobled tx authority accept-ownership --from <new-owner>
+```
+
+---
+
+## Queries
+
+Query for the current owner of the authority module.
+
+```sh
+nobled q authority owner
+```
+
+Query for the current pending owner of the authority module. This is only relevant if a transfer of ownership is in progress.
+
+```sh
+nobled q authority pending-owner
+```

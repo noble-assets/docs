@@ -1,0 +1,104 @@
+---
+sidebar_position: 1
+tags: 
+    - USDC
+description: Module details
+---
+
+# Noble CCTP Module
+
+Note that there are key differences between Cosmos appchains like Noble and EVM-compatible blockchains. Unlike on EVM chains where CCTP is a set of smart contracts, CCTP on Noble is a Cosmos SDK module, which is deployed by Noble governance and built into the Noble blockchain. Cosmos appchains can use IBC to build composable flows with CCTP on Noble.
+
+CCTP on Noble source code is available at https://github.com/circlefin/noble-cctp. The full message spec is defined at noble-cctp/x/cctp/spec/02_messages.md. The interface below serves as a reference for permissionless messaging functions exposed by the module.
+
+## Module Interface
+
+**depositForBurn**
+**Message:** `MsgDepositForBurn`
+
+Broadcast a transaction that deposits for burn to a provided domain.
+
+**Arguments:**
+
+- `Amount` - The burn amount
+- `DestinationDomain` - Domain of destination chain
+- `MintRecipient` - address receiving minted tokens on destination chain as a 32 length byte array
+- `BurnToken` - The burn token address on source domain
+
+**depositForBurnWithCaller**
+**Message:** `MsgDepositForBurnWithCaller`
+
+Broadcast a transaction that deposits for burn with caller to a provided domain.
+
+This message wraps `MsgDepositForBurn`. It adds one extra argument, `destinationCaller`.
+
+**Arguments:**
+
+- `Amount` - The burn amount
+- `DestinationDomain` - Domain of destination chain
+- `MintRecipient` - address receiving minted tokens on destination chain as a 32 length byte array
+- `BurnToken` - The burn token address on source domain
+- `DestinationCaller` - authorized caller as 32 length byte array of receiveMessage() on destination domain
+
+**replaceDepositForBurn**
+**Message:** `MsgReplaceDepositForBurn`
+
+Broadcast a transaction that replaces a deposit for burn message. Replace the mint recipient and/or destination caller.
+
+Allows the sender of a previous `BurnMessage` (created by `depositForBurn` or `depositForBurnWithCaller`) to send a new `BurnMessage` to replace the original. The new BurnMessage will reuse the amount and burn token of the original without requiring a new deposit.
+
+**Arguments:**
+
+- `OriginalMessage` - original message bytes to replace
+- `OriginalAttestation` - attestation bytes of OriginalMessage
+- `NewDestinationCaller` - the new destination caller, which may be the same as the original destination caller, a new destination caller, or an empty destination caller, indicating that any destination caller is valid.
+- `NewMintRecipient` - the new mint recipient. May be the same as the original mint recipient, or different.
+
+**receiveMessage**
+**Message:** `MsgReceiveMessage`
+
+Broadcast a transaction that receives a provided message from another domain. After validation, it performs a mint.
+
+**Arguments:**
+
+- `message` [Message Format](https://developers.circle.com/stablecoins/docs/message-format)
+- `attestation` - Concatenated 65-byte signature(s) of `message`, in increasing order of the attester address recovered from signatures.
+
+**sendMessage**
+**Message:** `MsgSendMessage`
+
+Broadcast a transaction that sends a message to a provided domain.
+
+**Arguments:**
+
+- `DestinationDomain` - Domain of destination chain
+- `Recipient` - Address of message recipient on destination chain
+- `MessageBody` - Raw bytes content of message
+
+**sendMessageWithCaller**
+**Message:** `MsgSendMessageWithCaller`
+
+Broadcast a transaction that sends a message with a caller to a provided domain.
+
+Specifying a Destination caller requires that only the specified caller can call `receiveMessage` on destination domain.
+
+This message wraps `SendMessage`. It adds one extra argument, `DestinationCaller`.
+
+**Arguments:**
+
+- `DestinationDomain` - Domain of destination chain
+- `Recipient` - Address of message recipient on destination chain
+- `MessageBody` - Raw bytes content of message
+- `DestinationCaller` - Caller on the destination domain, as 32 length byte array
+
+**replaceMessage**
+**Message:** `MsgReplaceMessage`
+
+Broadcast a transaction that replaces a provided message. Replace the message body and/or destination caller.
+
+**Arguments:**
+
+- `OriginalMessage` - Original message bytes to replace
+- `OriginalAttestation` - Attestation bytes of OriginalMessage
+- `NewMessageBody` - New message body of replaced message
+- `NewDestinationCaller` - The new destination caller, which may be the same as the original destination caller, a new destination caller, or an empty destination caller, indicating that any destination caller is valid.
