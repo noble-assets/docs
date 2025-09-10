@@ -1,0 +1,187 @@
+---
+id: architecture
+title: Architecture
+sidebar_label: Architecture
+sidebar_position: 2
+---
+
+# Architecture
+The Noble Dollar module consists of three interconnected components, each serving specific functions.
+
+<img src={require('./diagram.png').default} alt="USDN Architecture Diagram" width="600" />
+
+*Figure 1: USDN Architecture Overview - Core, Portal, and Vaults modules with yield distribution flow*
+
+## Core Module
+This is the foundation of USDN’s rebasing functionality, implementing the core business logic that enables automatic yield distribution. Its key components are:
+- **Index management:** Maintains the global rebasing multiplier that determines yield accrual.
+- **Principal accounting:** Tracks each user’s underlying stake separately from their rebasing balance.
+- **Yield distribution:** Calculates and distributes yield proportionally to all holders.
+
+**Key Operations:**
+- `MsgClaimYield`: Users claim their accrued yield
+- `MsgSetPausedState`: Authority can pause/unpause protocol operations
+
+**Message Interfaces:**
+
+```go
+message MsgClaimYield {
+  string signer = 1;
+}
+
+message MsgSetPausedState {
+  string signer = 1;
+  bool paused = 2;
+}
+```
+
+**CLI:**
+
+```bash
+# Claim accrued yield
+nobled tx dollar claim-yield --from <signer>
+```
+
+## Portal Module
+Enables cross‑chain functionality while preserving USDN’s yield‑bearing properties across different blockchain networks. Its key functions include:
+- **Cross‑chain transfers:** Burn and mint USDN across supported networks.
+- **Wormhole integration:** Uses Wormhole’s Native Token Transfer (NTT) for secure bridging.
+- **Peer management:** Configures trusted contracts on destination networks.
+- **Message verification:** Validates cross‑chain messages through cryptographic proofs.
+
+**Supported networks:**
+
+- Ethereum and EVM‑compatible networks.
+- Other Cosmos zones (via IBC).
+- Additional networks through Wormhole infrastructure.
+
+Portal ensures that when you transfer USDN to another network, you receive the same yield‑bearing token with identical rebasing properties.
+
+**Key Operations:**
+- `MsgTransfer`: Initiate cross-chain USDN transfer (burns tokens on source)
+- `MsgDeliver`: Process incoming cross-chain messages (mints tokens on destination)
+- `MsgSetPeer`: Configure trusted contracts on destination networks
+
+**Message Interfaces:**
+
+```go
+message MsgTransfer {
+  string signer = 1;
+  string amount = 2;
+  uint32 destination_chain_id = 3;
+  bytes destination_token = 4;
+  bytes recipient = 5;
+}
+
+message MsgDeliver {
+  string signer = 1;
+  bytes vaa = 2;
+}
+
+message MsgSetPeer {
+  string signer = 1;
+  uint32 chain = 2;
+  bytes transceiver = 3;
+  bytes manager = 4;
+}
+```
+
+**CLI:**
+
+```bash
+# Cross-chain transfers and permissionless manual relaying
+nobled tx dollar portal deliver <vaa_payload> --from <signer>
+```
+
+## Vaults Module
+
+Provides additional yield opportunities through structured products that complement the base USDN yield. Vaults are currently of the following types:
+
+### Points Vault
+- Deposit USDN to earn points. [See here](https://www.noble.xyz/blog/noble-usdn-points-next-phase) to learn more about the ongoing points program.
+- Upcoming Hyperliquid managed vault with enhanced features.
+- Yield collection managed by a configured collector address.
+
+**Key Operations:**
+- `MsgLock`: Stake USDN into flexible/staked vaults
+- `MsgUnlock`: Withdraw USDN and claim vault rewards
+
+**Message Interfaces:**
+
+```go
+enum VaultType {
+  UNSPECIFIED = 0;
+  STAKED = 1;
+  FLEXIBLE = 2;
+}
+
+message MsgLock {
+  string signer = 1;
+  VaultType vault = 2;
+  string amount = 3;
+}
+
+message MsgUnlock {
+  string signer = 1;
+  VaultType vault = 2;
+  string amount = 3;
+}
+```
+
+**CLI:**
+
+```bash
+# Lock USDN in vault
+nobled tx dollar vaults lock <vault_type> <amount> --from <signer>
+
+# Unlock USDN from vault
+nobled tx dollar vaults unlock <vault_type> <amount> --from <signer>
+```
+
+## Key Formulas
+### Rebasing Formulas
+```
+Present Amount = Principal Amount × Index ÷ 1e12
+Principal Amount = Present Amount × 1e12 ÷ Index (rounded)
+```
+
+### Yield Calculations
+```
+Expected Balance = Principal × Current Index ÷ 1e12
+Claimable Yield = Expected Balance - Current Balance
+```
+
+### Index Operations
+```
+New Supply = Total Principal × New Index ÷ 1e12
+Yield Amount = New Supply - Current Supply
+```
+The index starts at `1e12` and increases as yield accrues, causing all balances to grow proportionally.
+
+## Data Flow
+This section walks through a step-by-step process of how yield is distributed:
+
+1. **Index updates:** The protocol updates the global rebasing index.  
+2. **Supply adjustment:** New tokens are minted to match the expected supply based on the new index.  
+3. **Yield distribution:** Newly minted tokens are distributed to:  
+   - **Yield module** (for direct holder distribution)  
+   - **Vaults** (for additional rewards)  
+   - **External networks** (via IBC and Hyperlane)  
+4. **Balance updates:** User balances automatically reflect the new yield.  
+
+### Example Calculation
+
+**Initial state**
+
+- User holds **1,000 USDN**.  
+- User’s principal: **1,000,000,000,000** (1e12)
+- Current index: **1,000,000,000,000**  
+
+**After a yield event**
+
+- New index: **1,050,000,000,000** (5 % increase).  
+- New balance = `Principal × New Index ÷ 1e12`.  
+- New balance = `1,000,000,000,000 × 1,050,000,000,000 ÷ 1e12 = 1,050 USDN`.  
+- The user automatically earns **50 USDN** (5 % yield).  
+
+The above example shows how a 5 % increase in the global index automatically translates to a 5 % increase in every user’s token balance, without any action required on their part.
