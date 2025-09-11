@@ -6,30 +6,28 @@ sidebar_position: 1
 ---
 
 # Overview
-[Noble Dollar (USDN)](https://dollar.noble.xyz/) is a yield-bearing stablecoin, fully backed by short-term U.S. Treasury Bills, that automatically accrues yield (~4% as of writing) through a **rebasing
+[Noble Dollar (USDN)](https://dollar.noble.xyz/) is a yield-bearing stablecoin, fully backed by short-term U.S. Treasury Bills, that automatically accrues rewards (~4% as of writing) through a **rebasing
 mechanism.** 
 
-Unlike traditional stablecoins, USDN holders earn yield simply by holding the token in their wallet - no staking or additional actions required.
+Unlike traditional stablecoins, USDN holders earn rewards by holding the token in their wallet and manually claiming the accrued rewards - no staking required.
 
 USDN is an implementation of $M of the [M0 protocol](https://www.m0.org/). M0 is a permissionless platform built on Ethereum for the purpose of issuing application-specific stablecoins.
 Each $M token is backed 1:1 by risk-free reserves. Because USDN is an extension of $M, the [collateral backing $M](https://dashboard.m0.org/) extends to USDN as well.
 
-What sets USDN apart from other yield-bearing stablecoins is its feature of [**'Composable Yield'**](https://www.noble.xyz/blog/composable-yield-a-new-paradigm-for-stablecoins), **which allows the integrators of USDN (and not the issuer) to decide who gets the yield and how its used.**
+What sets USDN apart from other yield-bearing stablecoins is its feature of [**'Composable Yield'**](https://www.noble.xyz/blog/composable-yield-a-new-paradigm-for-stablecoins), **which allows the integrators of USDN (and not the issuer) to decide who gets the rewards and how they're used.**
 
 ## How USDN Works
-By locking $M on Ethereum through [M0’s Portal bridge](https://docs.m0.org/home/technical-documentations/m-portal/core-bridging-process/) (powered by [Wormhole’s Native Token Transfer](https://wormhole.com/products/native-token-transfers)), Noble can mint USDN on‐chain and programmatically direct the underlying yield back to its holders.
+By locking $M on Ethereum through [M0’s Portal bridge](https://docs.m0.org/home/technical-documentations/m-portal/core-bridging-process/) (powered by [Wormhole’s Native Token Transfer](https://wormhole.com/products/native-token-transfers)), Noble can mint USDN on‐chain and programmatically direct the underlying rewards back to its holders.
 
-USDN uses a rebasing mechanism **where the token supply adjusts to reflect yield accrual**. When yield is distributed, new tokens are minted proportionally to existing holdings. Your USDN balance increases automatically as yield accrues, maintaining your purchasing power
-while generating returns. The protocol tracks two key values:                                                                                                      
-- **Present Amount:** Your visible token balance that increases with yield.                                                            
-- **Principal Amount:** Your underlying stake that remains constant.                                                                                         
+USDN uses a rebasing mechanism **where the token supply adjusts to reflect rewards accrual**. When rewards are distributed, new tokens are minted proportionally to existing holdings. Your USDN balance increases automatically as rewards accrue, maintaining your purchasing power
+while generating returns.                                                                                      
 
 ## Key Features
 
-- **Native Yield:** Earn Treasury yield simply by holding USDN.
-- **Composable Yield for Integrators**: Stream cross-chain yield from Noble to your network via [IBC](https://ibcprotocol.dev/) or [Hyperlane](https://hyperlane.xyz/).
+- **Native Rewards:** Earn Treasury yield simply by holding USDN.
+- **Composable Rewards for Integrators**: Stream cross-chain rewards from Noble to your network via [IBC](https://ibcprotocol.dev/) or [Hyperlane](https://hyperlane.xyz/).
 - **Treasury-Backed Collateral**: 100% collateralized by short-term U.S. Treasury Bills (generating ~4% as of writing).
-- **Developer Sovereignty**: Full programmatic control over yield allocation on your network.
+- **Developer Sovereignty**: Full programmatic control over rewards allocation on your network.
 
 ## Collateral
 
@@ -41,12 +39,12 @@ USDN is backed by short-term U.S. Treasury Bills held in Special Purpose Vehicle
 
 ### For Integrators
 
-- Automatically distribute yield to validator sets
-- Stream yield to DAO treasuries
-- Pass yield directly to users
+- Automatically distribute rewards to validator sets
+- Stream rewards to DAO treasuries
+- Pass rewards directly to users
 
 ### For Holders (End-users, Institutions, Protocols)
 
-- Earn risk-free yield from short-term U.S. T-Bills
-- Deposit USDN into the [Points Vault](https://points.noble.xyz/) to accrue points while foregoing yield
+- Earn risk-free rewards from short-term U.S. T-Bills
+- Deposit USDN into the [Points Vault](https://points.noble.xyz/) to accrue points while foregoing rewards
 - Deposit USDN into the Hyperliquid Managed Vault [Coming Soon!]

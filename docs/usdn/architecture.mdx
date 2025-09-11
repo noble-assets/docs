@@ -6,136 +6,262 @@ sidebar_position: 2
 ---
 
 # Architecture
-The Noble Dollar module consists of three interconnected components, each serving specific functions.
 
-<img src={require('./diagram.png').default} alt="USDN Architecture Diagram" width="600" />
+USDN is implemented as the `x/dollar` module. It handles all core functionality including rebasing mechanics, cross-chain operations, and vault management. 
 
-*Figure 1: USDN Architecture Overview - Core, Portal, and Vaults modules with yield distribution flow*
+The module uses collections for state management and integrates with external bridging protocols like Wormhole, IBC, and Hyperlane to enable USDN transfers while preserving rewards-bearing properties across different networks.
 
-## Core Module
-This is the foundation of USDN’s rebasing functionality, implementing the core business logic that enables automatic yield distribution. Its key components are:
-- **Index management:** Maintains the global rebasing multiplier that determines yield accrual.
-- **Principal accounting:** Tracks each user’s underlying stake separately from their rebasing balance.
-- **Yield distribution:** Calculates and distributes yield proportionally to all holders.
+<a href={require('./architecture.png').default} target="_blank">
+  <img src={require('./architecture.png').default} alt="USDN Architecture Diagram" width="600" />
+</a>
 
-**Key Operations:**
-- `MsgClaimYield`: Users claim their accrued yield
+*Figure 1: USDN Architecture Overview*
+
+## Rebasing Mechanism
+
+USDN automatically rebases when Treasury rewards accrue. The system tracks a global `Index` that increases over time, which grows user balances proportionally.
+
+For each user/address, the protocol tracks two key values:
+- **Principal Amount**: The fixed underlying stake (never changes)
+- **Present Amount**: What users see in their wallet (grows with rewards)
+
+The rewards distribution flow works as follows:
+
+1. **Index Update**: Noble receives an update index message periodically from M0
+2. **Supply Calculation**: New expected supply = `total principal × new index ÷ 1e12`
+3. **Token Minting**: Difference between expected and current supply gets minted
+4. **Rewards Distribution**: New tokens flow to the rewards module, then to holders (upon claiming) and cross-chain recipients
+
+### Rewards Distribution Example
+
+**Initial State:**
+- User holds: **1,000 USDN**
+- User's principal: **1,000,000,000,000** (1e12)
+- Current index: **1,000,000,000,000**
+
+**After 5% Treasury Rewards:**
+- New index: **1,050,000,000,000** (5% increase)
+- New balance = `Principal × New Index ÷ 1e12`
+- New balance = `1,000,000,000,000 × 1,050,000,000,000 ÷ 1e12 = 1,050 USDN`
+- User automatically earns: **50 USDN** (5% rewards)
+
+This 5% index increase automatically translates to a 5% increase in every user's token balance. Users are required to manually claim the rewards.
+
+## Cross-Chain Operations
+
+USDN works across multiple blockchains while preserving rebasing properties:
+
+- **M Portal:** M0's [M Portal](https://docs.m0.org/home/technical-documentations/m-portal/overview/) enables cross-chain bridging of the $M token using Wormhole's Native Token Transfer (NTT). When $M is transferred from Ethereum (where it is originally minted) to Noble through Portal, it gets minted on Noble as USDN.
+
+<a href={require('./flow.png').default} target="_blank">
+  <img src={require('./flow.png').default} alt="M Portal Cross-Chain Flow" width="1000" />
+</a>
+
+- **Cross-Chain Rewards:** Cross-chain rewards distribution happens via IBC and Hyperlane. When the index updates, rewards get claimed and sent to configured recipients on external chains through IBC channels and Hyperlane routes.
+
+## Points Vault
+
+The current vault system focuses on the Points Vault ([Season 2 of the points program](https://www.noble.xyz/blog/noble-usdn-points-next-phase)). Users lock USDN to earn points that will be redeemable for the $NOBL token when the [Noble AppLayer](https://www.noble.xyz/blog/noble-applayer) launches. The Points Vault is of the `STAKED` vault type. A managed Hyperliquid vault is in the works for additional reward opportunities.
+
+Vault positions use time-based keys to prevent multiple positions in the same block, and rewards get redirected to a configured collector address during Season 2.
+
+## Message Types
+
+**Core Operations**
+- `MsgClaimRewards`: Allows users to claim their accrued rewards
+```json
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/noble.dollar.v1.MsgClaimRewards",
+        "signer": "noble1user"
+      }
+    ],
+    "memo": "",
+    "timeout_height": "0",
+    "extension_options": [],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [],
+      "gas_limit": "200000",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "signatures": []
+}
+```
 - `MsgSetPausedState`: Authority can pause/unpause protocol operations
-
-**Message Interfaces:**
-
-```go
-message MsgClaimYield {
-  string signer = 1;
-}
-
-message MsgSetPausedState {
-  string signer = 1;
-  bool paused = 2;
+```json
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/noble.dollar.v1.MsgSetPausedState",
+        "signer": "noble1signer",
+        "paused": "true"
+      }
+    ],
+    "memo": "",
+    "timeout_height": "0",
+    "extension_options": [],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [],
+      "gas_limit": "200000",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "signatures": []
 }
 ```
 
-**CLI:**
-
-```bash
-# Claim accrued yield
-nobled tx dollar claim-yield --from <signer>
-```
-
-## Portal Module
-Enables cross‑chain functionality while preserving USDN’s yield‑bearing properties across different blockchain networks. Its key functions include:
-- **Cross‑chain transfers:** Burn and mint USDN across supported networks.
-- **Wormhole integration:** Uses Wormhole’s Native Token Transfer (NTT) for secure bridging.
-- **Peer management:** Configures trusted contracts on destination networks.
-- **Message verification:** Validates cross‑chain messages through cryptographic proofs.
-
-**Supported networks:**
-
-- Ethereum and EVM‑compatible networks.
-- Other Cosmos zones (via IBC).
-- Additional networks through Wormhole infrastructure.
-
-Portal ensures that when you transfer USDN to another network, you receive the same yield‑bearing token with identical rebasing properties.
-
-**Key Operations:**
+**Cross-Chain Operations**
 - `MsgTransfer`: Initiate cross-chain USDN transfer (burns tokens on source)
+```json
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/noble.dollar.portal.v1.MsgTransfer",
+        "signer": "noble1user",
+        "amount": "1000000",
+        "destination_chain_id": 2,
+        "destination_token": "base64_encoded_destination_token",
+        "recipient": "base64_encoded_recipient_address"
+      }
+    ],
+    "memo": "",
+    "timeout_height": "0",
+    "extension_options": [],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [],
+      "gas_limit": "200000",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "signatures": []
+}
+```
 - `MsgDeliver`: Process incoming cross-chain messages (mints tokens on destination)
-- `MsgSetPeer`: Configure trusted contracts on destination networks
-
-**Message Interfaces:**
-
-```go
-message MsgTransfer {
-  string signer = 1;
-  string amount = 2;
-  uint32 destination_chain_id = 3;
-  bytes destination_token = 4;
-  bytes recipient = 5;
-}
-
-message MsgDeliver {
-  string signer = 1;
-  bytes vaa = 2;
-}
-
-message MsgSetPeer {
-  string signer = 1;
-  uint32 chain = 2;
-  bytes transceiver = 3;
-  bytes manager = 4;
+```json
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/noble.dollar.portal.v1.MsgDeliver",
+        "signer": "noble1validator",
+        "vaa": "base64_encoded_vaa"
+      }
+    ],
+    "memo": "",
+    "timeout_height": "0",
+    "extension_options": [],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [],
+      "gas_limit": "200000",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "signatures": []
 }
 ```
 
-**CLI:**
-
-```bash
-# Cross-chain transfers and permissionless manual relaying
-nobled tx dollar portal deliver <vaa_payload> --from <signer>
+**Vault Operations**
+- `MsgLock`: Stake USDN into vaults for additional rewards
+```json
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/noble.dollar.vaults.v1.MsgLock",
+        "signer": "noble1signer",
+        "vault": "flexible",
+        "amount": 1000000
+      }
+    ],
+    "memo": "",
+    "timeout_height": "0",
+    "extension_options": [],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [],
+      "gas_limit": "200000",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "signatures": []
+}
 ```
-
-## Vaults Module
-
-Provides additional yield opportunities through structured products that complement the base USDN yield. Vaults are currently of the following types:
-
-### Points Vault
-- Deposit USDN to earn points. [See here](https://www.noble.xyz/blog/noble-usdn-points-next-phase) to learn more about the ongoing points program.
-- Upcoming Hyperliquid managed vault with enhanced features.
-- Yield collection managed by a configured collector address.
-
-**Key Operations:**
-- `MsgLock`: Stake USDN into flexible/staked vaults
 - `MsgUnlock`: Withdraw USDN and claim vault rewards
-
-**Message Interfaces:**
-
-```go
-enum VaultType {
-  UNSPECIFIED = 0;
-  STAKED = 1;
-  FLEXIBLE = 2;
-}
-
-message MsgLock {
-  string signer = 1;
-  VaultType vault = 2;
-  string amount = 3;
-}
-
-message MsgUnlock {
-  string signer = 1;
-  VaultType vault = 2;
-  string amount = 3;
+```json
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/noble.dollar.vaults.v1.MsgUnlock",
+        "signer": "noble1signer",
+        "vault": "flexible",
+        "amount": 500000
+      }
+    ],
+    "memo": "",
+    "timeout_height": "0",
+    "extension_options": [],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [],
+      "gas_limit": "200000",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "signatures": []
 }
 ```
 
-**CLI:**
+## CLI Commands
 
 ```bash
-# Lock USDN in vault
-nobled tx dollar vaults lock <vault_type> <amount> --from <signer>
+# Claim accrued rewards
+nobled tx dollar claim-rewards --from <signer>
 
-# Unlock USDN from vault
-nobled tx dollar vaults unlock <vault_type> <amount> --from <signer>
+# Process cross-chain message
+nobled tx dollar portal deliver <vaa_payload> --from <signer>
+
+# Lock USDN in Points Vault
+nobled tx dollar vaults lock STAKED <amount> --from <signer>
+
+# Query current rewards
+nobled query dollar rewards <address>
+
+# Check rebasing index
+nobled query dollar index
 ```
 
 ## Key Formulas
@@ -145,43 +271,15 @@ Present Amount = Principal Amount × Index ÷ 1e12
 Principal Amount = Present Amount × 1e12 ÷ Index (rounded)
 ```
 
-### Yield Calculations
+### Rewards Calculations
 ```
 Expected Balance = Principal × Current Index ÷ 1e12
-Claimable Yield = Expected Balance - Current Balance
+Claimable Rewards = Expected Balance - Current Balance
 ```
 
 ### Index Operations
 ```
 New Supply = Total Principal × New Index ÷ 1e12
-Yield Amount = New Supply - Current Supply
+Rewards Amount = New Supply - Current Supply
 ```
-The index starts at `1e12` and increases as yield accrues, causing all balances to grow proportionally.
-
-## Data Flow
-This section walks through a step-by-step process of how yield is distributed:
-
-1. **Index updates:** The protocol updates the global rebasing index.  
-2. **Supply adjustment:** New tokens are minted to match the expected supply based on the new index.  
-3. **Yield distribution:** Newly minted tokens are distributed to:  
-   - **Yield module** (for direct holder distribution)  
-   - **Vaults** (for additional rewards)  
-   - **External networks** (via IBC and Hyperlane)  
-4. **Balance updates:** User balances automatically reflect the new yield.  
-
-### Example Calculation
-
-**Initial state**
-
-- User holds **1,000 USDN**.  
-- User’s principal: **1,000,000,000,000** (1e12)
-- Current index: **1,000,000,000,000**  
-
-**After a yield event**
-
-- New index: **1,050,000,000,000** (5 % increase).  
-- New balance = `Principal × New Index ÷ 1e12`.  
-- New balance = `1,000,000,000,000 × 1,050,000,000,000 ÷ 1e12 = 1,050 USDN`.  
-- The user automatically earns **50 USDN** (5 % yield).  
-
-The above example shows how a 5 % increase in the global index automatically translates to a 5 % increase in every user’s token balance, without any action required on their part.
+The index starts at `1e12` and increases as rewards accrue, causing all balances to grow proportionally.
