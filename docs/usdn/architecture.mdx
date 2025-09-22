@@ -29,7 +29,7 @@ For each user/address, the protocol tracks two key values:
 
 The rewards distribution flow works as follows:
 
-1. **Index Update**: Noble receives an update index message periodically from M0
+1. **Index Update**: Noble periodically receives an updated index from M0
 2. **Supply Calculation**: New expected supply = `total principal × new index ÷ 1e12`
 3. **Token Minting**: Difference between expected and current supply gets minted
 4. **Rewards Distribution**: New tokens flow to the rewards module, then to holders (upon claiming) and cross-chain recipients
