@@ -103,3 +103,5 @@ html[data-theme='dark'] .launch-express {
   align-items: center;
   justify-content: center;
 }
+
+/* Mermaid diagram styling - minimal external CSS since themeCSS handles most styling */

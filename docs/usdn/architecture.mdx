@@ -9,278 +9,161 @@ sidebar_position: 2
 
 The implementation of USDN is in the [`dollar`](github.com/noble-assets/dollar) module.
 It handles all core functionality including rebasing mechanics,
-cross-chain operations, and vault management. 
+cross-chain operations, and vault management.
 
 The module integrates with external bridging protocols like Wormhole, IBC, and Hyperlane to enable USDN transfers while preserving rewards-bearing properties across different networks.
 
-<a href={require('./architecture.png').default} target="_blank">
-  <img src={require('./architecture.png').default} alt="USDN Architecture Diagram" width="600" />
-</a>
+ ```mermaid
+  flowchart TB
+    %% Top source
+    M0[M0]
 
-*Figure 1: USDN Architecture Overview*
+    %% x/dollar module
+    subgraph CORE ["x/dollar"]
+      IDX[Index Update]
+      UPS[Update Supply]
+      MINT[Mint Yield]
+      PRINCIPAL[("Principal")]
+      STATS[("Statistics")]
+
+      IDX --> UPS
+      UPS -->|yield = Δ supply| MINT
+    end
+
+    %% Connections into core
+    M0 --> IDX
+
+    %% Distribution
+    MINT --> YDE[Yield Distribution Engine]
+    YDE --> USER[User Wallets]
+
+    %% Cross-chain section
+    subgraph CCY ["Cross-Chain Yield"]
+      IBC[IBC]
+      HYP[Hyperlane]
+    end
+    YDE --> CCY
+    CCY --> ETH[Ethereum]
+    CCY --> ARB[Arbitrum]
+    CCY --> COS[Cosmos Chains]
+
+    %% User action back to core
+    USER --> |MsgClaimYield| CORE
+  ```
 
 ## Rebasing Mechanism
 
-USDN automatically rebases when Treasury rewards accrue. The system tracks a global `Index` that increases over time, which grows user balances proportionally.
+USDN automatically rebases when Treasury rewards accrue. The system tracks a global `Index` that increases over time, which grows user balances proportionally. 
+The `Index` field is a [`collections.Item`](https://docs.cosmos.network/v0.53/build/packages/collections#item) that stores the current USDN rebasing multiplier `(math.LegacyDec)`.
 
-For each user/address, the protocol tracks two key values:
-- **Principal Amount**: The fixed underlying stake (never changes)
+The index starts at `1.0` and increases as rewards accrue, causing all balances to grow proportionally.
+
+For each address, the protocol tracks two key values:
+- **Principal Amount**: The fixed underlying amount (never changes)
 - **Present Amount**: What users see in their wallet (grows with rewards)
 
 The rewards distribution flow works as follows:
 
 1. **Index Update**: Noble periodically receives an updated index from M0
-2. **Supply Calculation**: New expected supply = `total principal × new index ÷ 1e12`
+2. **Supply Calculation**: New expected supply = `total principal × new index`
 3. **Token Minting**: Difference between expected and current supply gets minted
-4. **Rewards Distribution**: New tokens flow to the rewards module, then to holders (upon claiming) and cross-chain recipients
+4. **Rewards Distribution**: New tokens flow to the rewards module account, then:
+   - **Users on Noble**: Must manually claim their rewards via [`MsgClaimYield`](https://github.com/noble-assets/dollar/blob/main/spec/02_messages.md#claim-yield)
+   - **Cross-chain recipients**: Rewards are automatically sent every ~2 hours via configured IBC/Hyperlane routes when index updates occur
 
 ### Rewards Distribution Example
 
 **Initial State:**
 - User holds: **1,000 USDN**
-- User's principal: **1,000,000,000,000** (1e12)
+- User's principal: **1,000** (underlying ownership)
 - Current index: **1,000,000,000,000**
 
 **After 5% Treasury Rewards:**
 - New index: **1,050,000,000,000** (5% increase)
-- New balance = `Principal × New Index ÷ 1e12`
-- New balance = `1,000,000,000,000 × 1,050,000,000,000 ÷ 1e12 = 1,050 USDN`
+- New balance = `Principal * (New Index / Old Index)`
+- New balance = `1,000 * 1.05 = 1,050 USDN`
 - User automatically earns: **50 USDN** (5% rewards)
 
 This 5% index increase makes 5% additional balance claimable per user based on their principal and the new index; balances update upon claim.
+
 ## Cross-Chain Operations
 
-USDN works across multiple blockchains while preserving rebasing properties:
+USDN enables cross-chain yield streaming functionality in a manner that preserves the token's yield-bearing properties across different blockchain networks.
 
-- **M Portal:** M0's [M Portal](https://docs.m0.org/home/technical-documentations/m-portal/overview/) enables cross-chain bridging of the $M token using Wormhole's Native Token Transfer (NTT). When $M is transferred from Ethereum (where it is originally minted) to Noble through Portal, it gets minted on Noble as USDN.
+Both \$M principal and the accrued yield are bridged to Noble from Ethereum via Wormhole's Native Token Transfer (NTT) through M0's [M Portal](https://docs.m0.org/home/technical-documentations/m-portal/overview/). This bridging mechanism locks the original \$M tokens on Ethereum and sends the equivalent value to Noble.
 
-<a href={require('./flow.png').default} target="_blank">
-  <img src={require('./flow.png').default} alt="M Portal Cross-Chain Flow" width="1000" />
-</a>
+```mermaid
+flowchart LR
+  %% Left domain
+  subgraph ETH [Ethereum]
+    M["$M"]
+    HUB[Hub Portal]
+    TX_E[Wormhole Transceiver]
+    CORE_E[Wormhole Core]
 
-- **Cross-Chain Rewards:** Cross-chain rewards distribution happens via IBC and Hyperlane. When the index updates, rewards get claimed and sent to configured recipients on external chains through IBC channels and Hyperlane routes.
+    M -->|lock| HUB -->|send| TX_E --> CORE_E
+  end
 
-## Points Vault
+  %% Middle
+  WGN[Wormhole Guardian Network] --> REL[Relayer]
 
-The current vault system focuses on the Points Vault ([Season 2 of the points program](https://www.noble.xyz/blog/noble-usdn-points-next-phase)). Users lock USDN to earn points that will be redeemable for the $NOBL token when the [Noble AppLayer](https://www.noble.xyz/blog/noble-applayer) launches. The Points Vault is of the `STAKED` vault type. A managed Hyperliquid vault is in the works for additional reward opportunities.
+  %% Right domain
+  subgraph NOBLE [Noble]
+    CORE_N[Wormhole Core]
+    TX_N[Wormhole Transceiver]
+    SPOKE[Spoke Portal]
+    USDN["$USDN"]
 
-Vault positions use time-based keys to prevent multiple positions in the same block, and rewards get redirected to a configured collector address during Season 2.
+    TX_N -->|receive| SPOKE -->|mint| USDN
+  end
 
-## Message Types
-
-**Core Operations**
-- `MsgClaimRewards`: Allows users to claim their accrued rewards
-```json
-{
-  "body": {
-    "messages": [
-      {
-        "@type": "/noble.dollar.v1.MsgClaimRewards",
-        "signer": "noble1user"
-      }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "extension_options": [],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [],
-      "gas_limit": "200000",
-      "payer": "",
-      "granter": ""
-    }
-  },
-  "signatures": []
-}
-```
-- `MsgSetPausedState`: Authority can pause/unpause protocol operations
-```json
-{
-  "body": {
-    "messages": [
-      {
-        "@type": "/noble.dollar.v1.MsgSetPausedState",
-        "signer": "noble1signer",
-        "paused": "true"
-      }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "extension_options": [],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [],
-      "gas_limit": "200000",
-      "payer": "",
-      "granter": ""
-    }
-  },
-  "signatures": []
-}
+  %% Stitch domains together
+  CORE_E --> WGN
+  REL --> CORE_N
+  CORE_N --> TX_N
 ```
 
-**Cross-Chain Operations**
-- `MsgTransfer`: Initiate cross-chain USDN transfer (burns tokens on source)
-```json
-{
-  "body": {
-    "messages": [
-      {
-        "@type": "/noble.dollar.portal.v1.MsgTransfer",
-        "signer": "noble1user",
-        "amount": "1000000",
-        "destination_chain_id": 2,
-        "destination_token": "base64_encoded_destination_token",
-        "recipient": "base64_encoded_recipient_address"
-      }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "extension_options": [],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [],
-      "gas_limit": "200000",
-      "payer": "",
-      "granter": ""
-    }
-  },
-  "signatures": []
-}
-```
-- `MsgDeliver`: Process incoming cross-chain messages (mints tokens on destination)
-```json
-{
-  "body": {
-    "messages": [
-      {
-        "@type": "/noble.dollar.portal.v1.MsgDeliver",
-        "signer": "noble1validator",
-        "vaa": "base64_encoded_vaa"
-      }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "extension_options": [],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [],
-      "gas_limit": "200000",
-      "payer": "",
-      "granter": ""
-    }
-  },
-  "signatures": []
-}
-```
+Once the bridged \$M arrives on Noble, it is minted as USDN with the same rebasing properties as the original \$M token.
 
-**Vault Operations**
-- `MsgLock`: Stake USDN into vaults for additional rewards
-```json
-{
-  "body": {
-    "messages": [
-      {
-        "@type": "/noble.dollar.vaults.v1.MsgLock",
-        "signer": "noble1signer",
-        "vault": "flexible",
-        "amount": 1000000
-      }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "extension_options": [],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [],
-      "gas_limit": "200000",
-      "payer": "",
-      "granter": ""
-    }
-  },
-  "signatures": []
-}
-```
-- `MsgUnlock`: Withdraw USDN and claim vault rewards
-```json
-{
-  "body": {
-    "messages": [
-      {
-        "@type": "/noble.dollar.vaults.v1.MsgUnlock",
-        "signer": "noble1signer",
-        "vault": "flexible",
-        "amount": 500000
-      }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "extension_options": [],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [],
-      "gas_limit": "200000",
-      "payer": "",
-      "granter": ""
-    }
-  },
-  "signatures": []
-}
-```
+From Noble, USDN can be further distributed to other blockchain networks via two primary bridging protocols. **IBC (Inter-Blockchain Communication)** enables USDN transfers to Cosmos SDK chains over IBC channels, while **Hyperlane** facilitates movement to EVM-compatible chains.
+## Vaults
 
-## CLI Commands
+USDN supports vault functionality that allows users to lock their tokens for additional rewards or benefits beyond the base yield.
 
-```bash
-# Claim accrued rewards
-nobled tx dollar claim-rewards --from <signer>
+### Points Vault
 
-# Process cross-chain message
-nobled tx dollar portal deliver <vaa_payload> --from <signer>
+The current vault system focuses on the Points Vault ([Season 2 of the points program](https://www.noble.xyz/blog/noble-usdn-points-next-phase)). Users lock USDN to earn points that will be redeemable for the \$NOBLE token when the [Noble AppLayer](https://www.noble.xyz/blog/noble-applayer) launches. A managed Hyperliquid vault is in the works for additional reward opportunities.
 
-# Lock USDN in Points Vault
-nobled tx dollar vaults lock STAKED <amount> --from <signer>
-
-# Query current rewards
-nobled query dollar rewards <address>
-
-# Check rebasing index
-nobled query dollar index
-```
+Each vault position is uniquely identified by a combination of user address, vault type, and creation timestamp. During Season 2 of the points program, rewards are redirected to a configured collector address.
 
 ## Key Formulas
+
 ### Rebasing Formulas
+
+```math
+\text{Present Amount} = \text{Principal Amount} \times \text{Index}
 ```
-Present Amount = Principal Amount × Index ÷ 1e12
-Principal Amount = Present Amount × 1e12 ÷ Index (rounded)
+
+```math
+\text{Principal Amount} = \frac{\text{Present Amount}}{\text{Index}}
 ```
 
 ### Rewards Calculations
+
+```math
+\text{Expected Balance} = \text{Principal} \times \text{Current Index}
 ```
-Expected Balance = Principal × Current Index ÷ 1e12
-Claimable Rewards = Expected Balance - Current Balance
+
+```math
+\text{Claimable Rewards} = \text{Expected Balance} - \text{Current Balance}
 ```
 
 ### Index Operations
+
+```math
+\text{New Supply} = \text{Total Principal} \times \text{New Index}
 ```
-New Supply = Total Principal × New Index ÷ 1e12
-Rewards Amount = New Supply - Current Supply
+
+```math
+\text{Rewards Amount} = \text{New Supply} - \text{Current Supply}
 ```
-The index starts at `1e12` and increases as rewards accrue, causing all balances to grow proportionally.
