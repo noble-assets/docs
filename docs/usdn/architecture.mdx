@@ -65,7 +65,7 @@ For each address, the protocol tracks two key values:
 The rewards distribution flow works as follows:
 
 1. **Index Update**: Noble periodically receives an updated index from M0
-2. **Supply Calculation**: New expected supply = `total principal × new index`
+2. **Supply Calculation**: New expected supply = `Total Principal × New Index`
 3. **Token Minting**: Difference between expected and current supply gets minted
 4. **Rewards Distribution**: New tokens flow to the rewards module account, then:
    - **Users on Noble**: Must manually claim their rewards via [`MsgClaimYield`](https://github.com/noble-assets/dollar/blob/main/spec/02_messages.md#claim-yield)
@@ -93,48 +93,36 @@ USDN enables cross-chain yield streaming functionality in a manner that preserve
 Both \$M principal and the accrued yield are bridged to Noble from Ethereum via Wormhole's Native Token Transfer (NTT) through M0's [M Portal](https://docs.m0.org/home/technical-documentations/m-portal/overview/). This bridging mechanism locks the original \$M tokens on Ethereum and sends the equivalent value to Noble.
 
 ```mermaid
-flowchart LR
-  %% Left domain
-  subgraph ETH [Ethereum]
-    M["$M"]
-    HUB[Hub Portal]
-    TX_E[Wormhole Transceiver]
-    CORE_E[Wormhole Core]
+  flowchart LR
+    %% Left domain
+    subgraph ETH [Ethereum]
+      M["$M"]
+      HUB[Hub Portal]
+      TX_E[Wormhole Transceiver]
+      CORE_E[Wormhole Core]
 
-    M -->|lock| HUB -->|send| TX_E --> CORE_E
-  end
+      M -->|lock| HUB -->|send| TX_E --> CORE_E
+    end
 
-  %% Middle
-  WGN[Wormhole Guardian Network] --> REL[Relayer]
+    %% Middle
+    WGN[Wormhole Guardian Network] --> REL[Relayer]
 
-  %% Right domain
-  subgraph NOBLE [Noble]
-    CORE_N[Wormhole Core]
-    TX_N[Wormhole Transceiver]
-    SPOKE[Spoke Portal]
-    USDN["$USDN"]
+    %% Right domain
+    subgraph NOBLE [Noble]
+      DOLLAR[Dollar Module]
+      USDN["$USDN"]
 
-    TX_N -->|receive| SPOKE -->|mint| USDN
-  end
+      DOLLAR -->|mint| USDN
+    end
 
-  %% Stitch domains together
-  CORE_E --> WGN
-  REL --> CORE_N
-  CORE_N --> TX_N
+    %% Stitch domains together
+    CORE_E --> WGN
+    REL --> DOLLAR
 ```
 
 Once the bridged \$M arrives on Noble, it is minted as USDN with the same rebasing properties as the original \$M token.
 
 From Noble, USDN can be further distributed to other blockchain networks via two primary bridging protocols. **IBC (Inter-Blockchain Communication)** enables USDN transfers to Cosmos SDK chains over IBC channels, while **Hyperlane** facilitates movement to EVM-compatible chains.
-## Vaults
-
-USDN supports vault functionality that allows users to lock their tokens for additional rewards or benefits beyond the base yield.
-
-### Points Vault
-
-The current vault system focuses on the Points Vault ([Season 2 of the points program](https://www.noble.xyz/blog/noble-usdn-points-next-phase)). Users lock USDN to earn points that will be redeemable for the \$NOBLE token when the [Noble AppLayer](https://www.noble.xyz/blog/noble-applayer) launches. A managed Hyperliquid vault is in the works for additional reward opportunities.
-
-Each vault position is uniquely identified by a combination of user address, vault type, and creation timestamp. During Season 2 of the points program, rewards are redirected to a configured collector address.
 
 ## Key Formulas
 

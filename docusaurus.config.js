@@ -213,7 +213,7 @@ const config = {
             curve: 'basis'
           }
         }
-      },
+      }
     }),
 };
 

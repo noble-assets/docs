@@ -10,7 +10,7 @@ sidebar_position: 1
 
 Unlike traditional stablecoins, USDN holders earn Treasury yield by holding the token in their wallet and manually claiming the accrued rewards.
 
-USDN is an implementation of \$M of the [M0 protocol](https://www.m0.org/). M0 is a permissionless platform built on Ethereum for the purpose of issuing application-specific stablecoins.
+USDN is an extention of \$M of the [M0 protocol](https://www.m0.org/). M0 is a permissionless platform built on Ethereum for the purpose of issuing application-specific stablecoins.
 Each \$M token is [backed by overcollateralized U.S. Treasury Bill reserves](https://dashboard.m0.org/). Because USDN is an extension of \$M, the collateral backing \$M extends to USDN as well.
 
 What sets USDN apart from other yield-bearing stablecoins is its feature of [**Composable Yield**](https://www.noble.xyz/blog/composable-yield-a-new-paradigm-for-stablecoins), **which allows the integrators of USDN (and not the issuer) to decide who gets the rewards and how they're used.**
@@ -22,9 +22,9 @@ USDN uses a rebasing mechanism whereby a global index increases as Treasury rewa
 
 ## Key Features
 
-- **Native Rewards:** Earn yield from short-term U.S. Treasury Bills (generating ~4% as of writing)
+- **Native Rewards:** Earn yield from short-term U.S. Treasury Bills
 - **Composable Rewards for Integrators**: Stream cross-chain rewards from Noble to your network via [IBC](https://ibcprotocol.dev/) or [Hyperlane](https://hyperlane.xyz/)
-- **Treasury-Backed Collateral**: 102% overcollateralized by short-term U.S. Treasury Bills
+- **Treasury-Backed Collateral**: 102% overcollateralized by short-term U.S. Treasury Bills (collateralization ratio is a [governance controlled parameter](https://docs.m0.org/home/technical-documentations/mintergateway/collateral-system/))
 - **Developer Sovereignty**: Full programmatic control over rewards allocation on your network
 
 ## Use Cases
@@ -42,5 +42,5 @@ Integrators can be blockchain networks, DeFi protocols, or applications that inc
 USDN holders include end-users, institutions, and protocols that hold the token for yield generation. They can:
 
 - Earn risk-free rewards from U.S. T-Bills
-- Deposit USDN into the [Points Vault](https://points.noble.xyz/) to accrue points while foregoing rewards
+- Deposit USDN into the [Points Vault](https://points.noble.xyz/) to accrue points while foregoing rewards. Points are redeemable for the $NOBLE token once Noble AppLayer launches. [Read here to learn more](https://www.noble.xyz/blog/noble-usdn-points-next-phase).
 - Deposit USDN into the Hyperliquid Managed Vault [Coming Soon!]
