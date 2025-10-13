@@ -11,7 +11,8 @@ The implementation of USDN is in the [`dollar`](https://github.com/noble-assets/
 It handles all core functionality including rebasing mechanics,
 cross-chain operations, and vault management.
 
-The module integrates with external bridging protocols like Wormhole, IBC, and Hyperlane to enable USDN transfers while preserving rewards-bearing properties across different networks.
+The module integrates with external bridging protocols like Wormhole, IBC, and Hyperlane
+to enable USDN transfers while preserving rewards-bearing properties across different networks.
 
  ```mermaid
   flowchart TB
@@ -53,10 +54,8 @@ The module integrates with external bridging protocols like Wormhole, IBC, and H
 
 ## Rebasing Mechanism
 
-USDN automatically rebases when Treasury rewards accrue. The system tracks a global `Index` that increases over time, which grows user balances proportionally. 
-The `Index` field is a [`collections.Item`](https://docs.cosmos.network/v0.53/build/packages/collections#item) that stores the current USDN rebasing multiplier `(math.LegacyDec)`.
-
-The index starts at `1.0` and increases as rewards accrue, causing all balances to grow proportionally.
+The so-called `Index` is used to keep track of the yield accrued by USDN, which is minted on Noble.
+It starts at `1.0` and increases as rewards accrue, allowing all balances to grow proportionally.
 
 For each address, the protocol tracks two key values:
 - **Principal Amount**: The fixed underlying amount (never changes)
@@ -68,10 +67,13 @@ The rewards distribution flow works as follows:
 2. **Supply Calculation**: New expected supply = `Total Principal × New Index`
 3. **Token Minting**: Difference between expected and current supply gets minted
 4. **Rewards Distribution**: New tokens flow to the rewards module account, then:
-   - **Users on Noble**: Must manually claim their rewards via [`MsgClaimYield`](https://github.com/noble-assets/dollar/blob/main/spec/02_messages.md#claim-yield)
-   - **Cross-chain recipients**: Rewards are automatically sent every ~2 hours via configured IBC/Hyperlane routes when index updates occur
+   <!-- TODO: we should eventually add a user flow page for this and show how to do it, would be helpful IMO -->
+   - **Users on Noble**: Must manually claim their rewards.
+   - **Cross-chain recipients**: Rewards are automatically sent every ~2 hours via configured IBC/Hyperlane routes when index updates occur.
 
 ### Rewards Distribution Example
+
+The following is a given example distribution flow, which describes the process of rebasing as it is explained above.
 
 **Initial State:**
 - User holds: **1,000 USDN**
@@ -126,32 +128,23 @@ From Noble, USDN can be further distributed to other blockchain networks via two
 
 ## Key Formulas
 
-### Rebasing Formulas
+The supply of USDN $S$ depends on the held principal $P$ and the mentioned index $I$.
 
 ```math
-\text{Present Amount} = \text{Principal Amount} \times \text{Index}
+S = \sum{P} * I
 ```
 
+When the index is updated, a new total supply is calculated and
+the difference between the old and new supply is paid out as yield.
+This yield is making up the sum of the individual claimable yields $Y_i$.
+
 ```math
-\text{Principal Amount} = \frac{\text{Present Amount}}{\text{Index}}
+Y_t = S_t - S_{t-1} = \sum_{i}{Y_{i,t}}
 ```
 
-### Rewards Calculations
+
+When a user claims, the balance of the account $B_i$ increases by the designated yield portion.
 
 ```math
-\text{Expected Balance} = \text{Principal} \times \text{Current Index}
-```
-
-```math
-\text{Claimable Rewards} = \text{Expected Balance} - \text{Current Balance}
-```
-
-### Index Operations
-
-```math
-\text{New Supply} = \text{Total Principal} \times \text{New Index}
-```
-
-```math
-\text{Rewards Amount} = \text{New Supply} - \text{Current Supply}
+B_{i,t} = Y_{i,t} + B_{i,t-1}
 ```
