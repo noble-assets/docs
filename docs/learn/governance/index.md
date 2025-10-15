@@ -1,6 +1,6 @@
 # Governance
 
-The Noble blockchain (“Noble”) will house an [Authority](../modules/authority.mdx) module that is controlled by a collective referred to as the Noble Maintenance 
+The Noble blockchain (“Noble”) will house an [Authority](../../deep-dive/modules/authority.mdx) module that is controlled by a collective referred to as the Noble Maintenance 
 Multisig (or “NMM”). The NMM has the following three functionalities:
 
 - Upgrade authority
