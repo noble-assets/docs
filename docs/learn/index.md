@@ -9,4 +9,5 @@ This section covers:
 - [**Governance**](./governance/index.mdx) - How Noble is managed and maintained by the Noble Maintenance Multisig
 - [**Proof of Authority**](./poa/index.mdx) - Noble's underlying consensus mechanism
 
+<!-- TODO: we need more pages here; maybe explaining what issuance means, etc. -->
 Whether you're new to Noble or looking to deepen your understanding, these guides will help you grasp the fundamentals of how Noble works and what makes it unique in the blockchain ecosystem.
