@@ -9,7 +9,7 @@ The Orbiter module is a payload-based module, which is capable of parsing cross-
 different sources, executing state transitions, and then forwarding funds to a destination
 counterparty. To leverage the Orbiter functionalities, integrators only have to send funds to the
 Orbiter account with the requested metadata and via the correct entrypoint. Refer to the
-[architecture docs](./architecture) for more details.
+[architecture docs](./architecture.md) for more details.
 
 The recipient of the cross-chain transfer MUST be the Orbiter module address:
 
@@ -23,7 +23,7 @@ This section describes how to create an Orbiter payload. Based on the bridge pro
 used to initiate the transfer, a specific payload must be provided. This is associated with the
 entrypoint for the particular protocol. For example, IBC allows to pass metadata along with a
 cross-chain transfer via the _memo_, which is a JSON-formatted string. Other protocols, like CCTP,
-require the payload to be in the bytes format. Refer to the [payload docs](./payload) for more
+require the payload to be in the bytes format. Refer to the [payload docs](./payload.md) for more
 details about the payload fields and the supported actions and forwardings.
 
 ### IBC Payload
