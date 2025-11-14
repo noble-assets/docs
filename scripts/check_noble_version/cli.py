@@ -10,6 +10,10 @@ from check_noble_version.parser import get_latest_version_from_upgrades
 from check_noble_version.tracker import load_tracker, save_tracker
 from check_noble_version.version import compare_versions
 from check_noble_version.github import get_diff_between_tags, format_diff_summary
+from check_noble_version.modules import (
+    get_module_versions_for_tag,
+    get_module_diffs,
+)
 
 
 def main():
@@ -60,6 +64,58 @@ def main():
                 print("DIFF SUMMARY")
                 print("=" * 50)
                 print(format_diff_summary(diff_data))
+                print("=" * 50)
+                
+                # Get module-specific information
+                print("\n" + "=" * 50)
+                print("MODULE VERSIONS & DIFFS")
+                print("=" * 50)
+                
+                # Get module versions for both tags
+                print(f"\nFetching module versions for {last_tracked}...")
+                base_modules = get_module_versions_for_tag(GITHUB_REPO, last_tracked)
+                print(f"Fetching module versions for {latest_version}...")
+                head_modules = get_module_versions_for_tag(GITHUB_REPO, latest_version)
+                
+                if base_modules and head_modules:
+                    print("\nModule Version Changes:")
+                    all_module_paths = set(base_modules.keys()) | set(head_modules.keys())
+                    for module_path in sorted(all_module_paths):
+                        base_version = base_modules.get(module_path, "N/A")
+                        head_version = head_modules.get(module_path, "N/A")
+                        if base_version != head_version:
+                            print(f"  {module_path}: {base_version} → {head_version}")
+                        elif base_version != "N/A":
+                            print(f"  {module_path}: {base_version} (unchanged)")
+                
+                # Get module-specific diffs
+                print(f"\nFetching module-specific diffs...")
+                module_diffs = get_module_diffs(GITHUB_REPO, last_tracked, latest_version)
+                
+                if module_diffs:
+                    print("\nModule-Specific Changes:")
+                    for module_path, diff_info in sorted(module_diffs.items()):
+                        file_count = len(diff_info['files'])
+                        additions = diff_info['total_additions']
+                        deletions = diff_info['total_deletions']
+                        changes = diff_info['total_changes']
+                        print(f"\n  {module_path}:")
+                        print(f"    Files changed: {file_count}")
+                        print(f"    Changes: +{additions}, -{deletions} ({changes} total)")
+                        if file_count <= 10:
+                            for file_info in diff_info['files']:
+                                status = file_info.get('status', 'unknown')
+                                filename = file_info.get('filename', 'unknown')
+                                print(f"      [{status}] {filename}")
+                        else:
+                            for file_info in diff_info['files'][:5]:
+                                status = file_info.get('status', 'unknown')
+                                filename = file_info.get('filename', 'unknown')
+                                print(f"      [{status}] {filename}")
+                            print(f"      ... and {file_count - 5} more files")
+                else:
+                    print("\n  No changes detected in tracked modules.")
+                
                 print("=" * 50)
             else:
                 print(f"\n  ⚠ Could not fetch diff from GitHub API.")

@@ -9,6 +9,12 @@ from check_noble_version.version import parse_version, compare_versions
 from check_noble_version.parser import get_latest_version_from_upgrades
 from check_noble_version.tracker import load_tracker, save_tracker
 from check_noble_version.github import get_diff_between_tags, format_diff_summary
+from check_noble_version.modules import (
+    get_relevant_module_paths,
+    get_module_versions_for_tag,
+    get_module_diffs,
+    MODULE_MAPPINGS,
+)
 from check_noble_version.config import (
     REPO_ROOT,
     MAINNET_MDX_PATH,
@@ -24,6 +30,10 @@ __all__ = [
     "save_tracker",
     "get_diff_between_tags",
     "format_diff_summary",
+    "get_relevant_module_paths",
+    "get_module_versions_for_tag",
+    "get_module_diffs",
+    "MODULE_MAPPINGS",
     "REPO_ROOT",
     "MAINNET_MDX_PATH",
     "TRACKER_JSON_PATH",
