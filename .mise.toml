@@ -1,0 +1,30 @@
+[tools]
+# Node.js - required for Docusaurus (package.json specifies >=18.0)
+node = "20.18.0"
+# Python - required for version tracking script
+python = "3.12"
+# Bun - used for package management and running scripts
+bun = "1.2.13"
+# uv - fast Python package installer and resolver
+uv = "latest"
+
+[tasks.install]
+description = "Install all dependencies"
+run = [
+  "bun install",
+  "uv venv",
+  "uv pip install --python .venv/bin/python -r requirements.txt"
+]
+
+[tasks.start]
+description = "Start local development server"
+run = "bun start"
+
+[tasks.build]
+description = "Build static content"
+run = "bun build"
+
+[tasks.check-version]
+description = "Check Noble version and compare with tracker"
+run = "uv run python scripts/check_noble_version.py"
+
