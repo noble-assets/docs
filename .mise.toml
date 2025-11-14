@@ -30,5 +30,5 @@ run = "uv run python scripts/check_noble_version.py"
 
 [tasks.test]
 description = "Run pytest unit tests"
-run = "uv run pytest tests/ -v"
+run = "uv run pytest scripts/check_noble_version/test_*.py -v"
 

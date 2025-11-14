@@ -1,4 +1,4 @@
-"""Unit tests for check_noble_version.py"""
+"""Unit tests for check_noble_version package"""
 
 import json
 import pytest
