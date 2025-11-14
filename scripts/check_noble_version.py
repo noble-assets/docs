@@ -31,13 +31,34 @@ def parse_version(version_str: str) -> Tuple[int, int, int]:
     
     Returns:
         Tuple of (major, minor, patch) integers
+    
+    Raises:
+        ValueError: If version format is invalid or contains suffixes (e.g., -rc1)
     """
+    # Check for version suffixes (e.g., -rc1, -beta, -alpha)
+    if '-' in version_str:
+        raise ValueError(
+            f"Version with suffix detected: '{version_str}'\n"
+            f"This tool currently does not support version suffixes (e.g., -rc1, -beta, -alpha).\n"
+            f"Please use only release versions in the format 'vX.Y.Z' (e.g., 'v11.0.0')."
+        )
+    
     # Remove 'v' prefix if present
     version_str = version_str.lstrip('v')
     parts = version_str.split('.')
     if len(parts) != 3:
-        raise ValueError(f"Invalid version format: {version_str}")
-    return (int(parts[0]), int(parts[1]), int(parts[2]))
+        raise ValueError(
+            f"Invalid version format: '{version_str}'\n"
+            f"Expected format: 'vX.Y.Z' or 'X.Y.Z' where X, Y, Z are integers."
+        )
+    
+    try:
+        return (int(parts[0]), int(parts[1]), int(parts[2]))
+    except ValueError as e:
+        raise ValueError(
+            f"Invalid version format: '{version_str}'\n"
+            f"All version components must be integers. Error: {e}"
+        )
 
 
 def compare_versions(version1: str, version2: str) -> int:
@@ -48,9 +69,16 @@ def compare_versions(version1: str, version2: str) -> int:
         -1 if version1 < version2
          0 if version1 == version2
          1 if version1 > version2
+    
+    Raises:
+        ValueError: If either version format is invalid or contains suffixes
     """
-    v1 = parse_version(version1)
-    v2 = parse_version(version2)
+    try:
+        v1 = parse_version(version1)
+        v2 = parse_version(version2)
+    except ValueError as e:
+        # Re-raise with context about which version failed
+        raise ValueError(f"Error comparing versions '{version1}' and '{version2}':\n{e}")
     
     if v1 < v2:
         return -1
@@ -80,9 +108,10 @@ def get_latest_version_from_upgrades(mdx_path: Path) -> Optional[str]:
         print(f"Error reading file {mdx_path}: {e}", file=sys.stderr)
         return None
     
-    # Pattern to match version tags in markdown links: [`vX.Y.Z`](url)
-    # This matches patterns like [`v11.0.0`](https://github.com/...)
-    version_pattern = r'\[`(v\d+\.\d+\.\d+)`\]'
+    # Pattern to match version tags in markdown links: [`vX.Y.Z`](url) or [`vX.Y.Z-suffix`](url)
+    # This matches patterns like [`v11.0.0`](https://github.com/...) or [`v11.0.0-rc1`](...)
+    # We capture versions with optional suffixes to detect and handle them
+    version_pattern = r'\[`(v\d+\.\d+\.\d+(?:-[a-zA-Z0-9]+)?)`\]'
     
     # Find all version matches
     versions = re.findall(version_pattern, content)
@@ -91,11 +120,31 @@ def get_latest_version_from_upgrades(mdx_path: Path) -> Optional[str]:
         print("Warning: No versions found in the upgrades table", file=sys.stderr)
         return None
     
+    # Check for versions with suffixes and report them
+    versions_with_suffixes = [v for v in versions if '-' in v]
+    if versions_with_suffixes:
+        print("\n⚠ Warning: Found versions with suffixes in the upgrades table:", file=sys.stderr)
+        for v in versions_with_suffixes:
+            print(f"  - {v}", file=sys.stderr)
+        print("\nThis tool cannot handle version suffixes (e.g., -rc1, -beta, -alpha).", file=sys.stderr)
+        print("Please update the documentation to use only release versions.", file=sys.stderr)
+        print("\nError details:", file=sys.stderr)
+        try:
+            # Try to parse one to trigger the error message
+            parse_version(versions_with_suffixes[0])
+        except ValueError as e:
+            print(f"{e}", file=sys.stderr)
+        return None
+    
     # Find the latest version by comparing all found versions
-    latest_version = versions[0]
-    for version in versions[1:]:
-        if compare_versions(version, latest_version) > 0:
-            latest_version = version
+    try:
+        latest_version = versions[0]
+        for version in versions[1:]:
+            if compare_versions(version, latest_version) > 0:
+                latest_version = version
+    except ValueError as e:
+        print(f"\nError: Failed to compare versions: {e}", file=sys.stderr)
+        return None
     
     return latest_version
 
@@ -172,7 +221,12 @@ def main():
         print(f"Last tracked version: {last_tracked}")
         
         # Compare versions
-        comparison = compare_versions(last_tracked, latest_version)
+        try:
+            comparison = compare_versions(last_tracked, latest_version)
+        except ValueError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            print("\nPlease ensure both versions are in the format 'vX.Y.Z' without suffixes.", file=sys.stderr)
+            sys.exit(1)
         
         if comparison == 0:
             print("\n✓ Versions match! Documentation is up to date.")
