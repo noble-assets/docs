@@ -29,7 +29,7 @@ Users must manually claim their accumulated rewards to see their balance increas
 ## Key Features
 
 - **Native Rewards:** Earn yield from short-term U.S. Treasury Bills.
-- **Composable Rewards for Integrators**: Stream cross-chain rewards from Noble to your network via [IBC](https://ibcprotocol.dev/) or [Hyperlane](https://hyperlane.xyz/).
+- **Composable Rewards for Integrators**: Stream cross-chain rewards from Noble to your network via [IBC](https://ibcprotocol.dev/) or [Hyperlane](https://www.hyperlane.xyz/).
 - **Treasury-Backed Collateral**: 102% overcollateralized by short-term U.S. Treasury Bills (collateralization ratio is a [governance controlled parameter](https://docs.m0.org/home/technical-documentations/mintergateway/collateral-system/)).
 - **Developer Sovereignty**: Full programmatic control over rewards allocation on your network.
 

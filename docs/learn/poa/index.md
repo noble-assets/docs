@@ -1,0 +1,24 @@
+---
+sidebar_position: 2
+title: Proof of Authority
+---
+
+Noble is a Proof of Authority chain with a trusted validator set 
+(a subset of Cosmos Hub validators).
+The validator set will be permissioned by 
+equal shares of staking tokens placed in vesting accounts.
+The tokens will have no value.
+Economic security will derive from fees captured by the chain
+in USDC and other assets on a block-by-block basis.
+If a double sign is detected by the chain,
+the validator address will be “tombstoned”,
+meaning that their tokens and the address will no longer be usable for validation
+and resulting in the loss of all future fee revenue.
+The Proof of Authority model provides real economic cost 
+to faulty validator behavior and thus provides economic security to the network 
+that can be computed in real time based on past and projected fees.
+
+Noble intends to monitor developments in shared security across the blockchain 
+ecosystem to ensure the optimality of the security model.
+
+The current validator set can be inspected e.g. on [Mintscan](https://www.mintscan.io/noble/validators).

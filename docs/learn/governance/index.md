@@ -1,6 +1,6 @@
 # Governance
 
-The Noble blockchain (“Noble”) will house an [Authority](../modules/authority.mdx) module that is controlled by a collective referred to as the Noble Maintenance 
+The Noble blockchain (“Noble”) will house an [Authority](../../deep-dive/modules/authority.mdx) module that is controlled by a collective referred to as the Noble Maintenance 
 Multisig (or “NMM”). The NMM has the following three functionalities:
 
 - Upgrade authority
@@ -15,7 +15,7 @@ A standard multisignature application (the “Noble Multisig”) will form the N
 
 The NMM has the ability to initiate parameter changes. This authority is distinct from the upgrade functionality as it would not require the Noble validators to run a new chain binary. A parameter change would automatically be introduced into the state machine of the Noble chain.
 
-### IBC Connection Maintenance:
+### IBC Connection Maintenance
 
 The NMM has the ability to both re-establish IBC connections that have expired as well as sever IBC connections. Any such action related to an IBC connection is achieved automatically upon execution by the Noble Multisig. This documentation further outlines situations where IBC maintenance would be required.
 

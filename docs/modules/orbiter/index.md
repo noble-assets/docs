@@ -123,8 +123,8 @@ go test -v ./e2e/... -run <TEST_NAME>
 
 ## Architecture
 
-See [architecture](./architecture).
+See [architecture](./architecture.md).
 
 ## Integration
 
-See [integration](./integration)
+See [integration](./integration.md)
