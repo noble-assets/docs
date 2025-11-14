@@ -12,7 +12,7 @@ uv = "latest"
 description = "Install all dependencies"
 run = [
   "bun install",
-  "uv venv",
+  "uv venv --clear",
   "uv pip install --python .venv/bin/python -r requirements.txt"
 ]
 
@@ -27,4 +27,8 @@ run = "bun build"
 [tasks.check-version]
 description = "Check Noble version and compare with tracker"
 run = "uv run python scripts/check_noble_version.py"
+
+[tasks.test]
+description = "Run pytest unit tests"
+run = "uv run pytest tests/ -v"
 
